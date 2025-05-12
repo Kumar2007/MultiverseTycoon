@@ -404,24 +404,27 @@ class MultiVerseTycoon:
             print("\n=== Actions ===")
             print("1. Start a new business")
             print("2. Hire employees")
-            print("3. Bribe officials (Reduce danger level)")
-            print("4. Jump to another universe")
-            print("5. Save game")
-            print("6. Quit game")
+            print("3. Fire employees")
+            print("4. Bribe officials (Reduce danger level)")
+            print("5. Jump to another universe")
+            print("6. Save game")
+            print("7. Quit game")
             
-            choice = input("\nChoose an action (1-6): ")
+            choice = input("\nChoose an action (1-7): ")
             
             if choice == "1":
                 self.start_business()
             elif choice == "2":
                 self.hire_employee()
             elif choice == "3":
-                self.bribe_officials()
+                self.fire_employee()
             elif choice == "4":
-                self.jump_universe()
+                self.bribe_officials()
             elif choice == "5":
-                self.save_game()
+                self.jump_universe()
             elif choice == "6":
+                self.save_game()
+            elif choice == "7":
                 confirm = input("\nAre you sure you want to quit? Progress will be lost unless saved. (y/n): ")
                 if confirm.lower() == "y":
                     print("\nThanks for playing Multiverse Tycoon!")
@@ -432,7 +435,7 @@ class MultiVerseTycoon:
                 continue
                 
             # Only advance the turn if the player didn't save/quit
-            if choice not in ["5", "6"]:
+            if choice not in ["6", "7"]:
                 self.advance_turn()
                 
             # Check for game over conditions
@@ -555,6 +558,79 @@ class MultiVerseTycoon:
             print("\nPlease enter a valid number.")
             time.sleep(1.5)
             self.hire_employee()
+    
+    def fire_employee(self):
+        """Fire an employee in the current universe."""
+        universe_id = self.player["current_universe"]
+        universe = self.universes[universe_id]
+        player_universe_data = self.player["universes"][universe_id]
+        
+        self.clear_screen()
+        print(f"\n=== Fire Employees in {universe['name']} ===")
+        
+        # Check if there are any employees to fire
+        if not player_universe_data['employees']:
+            print("\nYou don't have any employees to fire in this universe!")
+            input("\nPress Enter to continue...")
+            return
+            
+        # Display current employees
+        print("\nYour Current Employees:")
+        for i, employee in enumerate(player_universe_data['employees'], 1):
+            emp_type = self.employee_types[employee['type']]
+            print(f"{i}. {emp_type['name']} - Salary: {emp_type['salary_per_turn']} {universe['currency']}/turn")
+            print(f"   Efficiency Bonus: +{emp_type['efficiency_bonus']*100}% income")
+            print(f"   Risk Reduction: -{emp_type['risk_reduction']} danger/turn")
+            print(f"   Loyalty: {employee['loyalty']}%\n")
+            
+        print(f"{len(player_universe_data['employees']) + 1}. Cancel")
+        
+        try:
+            choice = int(input("\nWhich employee would you like to fire? "))
+            
+            if choice == len(player_universe_data['employees']) + 1:
+                return
+                
+            if 1 <= choice <= len(player_universe_data['employees']):
+                # Get the employee to fire
+                employee_index = choice - 1
+                employee = player_universe_data['employees'][employee_index]
+                emp_type = self.employee_types[employee['type']]
+                
+                # Severance pay (25% of hiring cost)
+                severance_pay = int(emp_type['hiring_cost'] * 0.25)
+                
+                # Check if player has enough cash for severance
+                if player_universe_data["cash"] < severance_pay:
+                    print(f"\nNot enough cash for severance pay! You need {severance_pay} {universe['currency']}.")
+                    input("\nPress Enter to continue...")
+                    return
+                
+                # Pay severance and fire the employee
+                player_universe_data["cash"] -= severance_pay
+                fired_employee = player_universe_data['employees'].pop(employee_index)
+                
+                # Reputation impact based on loyalty
+                reputation_change = -10 + int(employee['loyalty'] / 10)  # Better loyalty = less reputation damage
+                player_universe_data["reputation"] += reputation_change
+                
+                self.slow_print(f"\nYou've fired a {emp_type['name']} from the {universe['name']} universe.")
+                print(f"Severance pay: {severance_pay} {universe['currency']}")
+                
+                if reputation_change < 0:
+                    print(f"Reputation change: {reputation_change}")
+                else:
+                    print(f"Reputation change: +{reputation_change}")
+                    
+                input("\nPress Enter to continue...")
+            else:
+                print("\nInvalid choice. Please try again.")
+                time.sleep(1.5)
+                self.fire_employee()
+        except ValueError:
+            print("\nPlease enter a valid number.")
+            time.sleep(1.5)
+            self.fire_employee()
     
     def bribe_officials(self):
         """Bribe officials to reduce danger level."""

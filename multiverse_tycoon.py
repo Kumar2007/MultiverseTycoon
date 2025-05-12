@@ -33,7 +33,15 @@ class MultiVerseTycoon:
             "mini_games_played": 0,  # Total number of mini games played
             "mini_games_won": 0,  # Total number of mini games won
             "mini_game_history": [],  # History of played mini games
-            "mini_game_cooldown": 0  # Turns until next mini game is available
+            "mini_game_cooldown": 0,  # Turns until next mini game is available
+            "unlocked_features": {  # Features that have been unlocked by the player
+                "universe_travel": False,  # Ability to travel between universes
+                "currency_exchange": False,  # Ability to exchange currencies
+                "heist_operations": False,  # Ability to perform heists
+                "specialists": False,  # Ability to recruit specialists
+                "special_items": False,  # Ability to purchase special items
+                "mini_games": False  # Ability to play mini-games
+            }
         }
 
         self.universes = {
@@ -572,19 +580,61 @@ class MultiVerseTycoon:
             print("2. Hire employees")
             print("3. Fire employees")
             print("4. Bribe officials (Reduce danger level)")
-            print("5. Jump to another universe")
-            print("6. Currency exchange")
-            print("7. Quantum business center")
-            print("8. View exchange rates")
-            print("9. Heist operations")
-            print("10. Recruit specialists")
-            print("11. Purchase special items")
-            print("12. Play mini games")
-            print("13. Save game")
-            print("14. Quit game")
+            
+            # Only show unlocked features
+            options = []
+            option_index = 5  # Start counting from option 5
+            
+            # Universe travel (unlocks at turn 10)
+            if self.player["unlocked_features"]["universe_travel"]:
+                print(f"{option_index}. Jump to another universe")
+                options.append("universe_travel")
+                option_index += 1
+            
+            # Currency exchange (unlocks at turn 15)
+            if self.player["unlocked_features"]["currency_exchange"]:
+                print(f"{option_index}. Currency exchange")
+                options.append("currency_exchange")
+                option_index += 1
+                print(f"{option_index}. View exchange rates")
+                options.append("exchange_rates")
+                option_index += 1
+            
+            # Heist operations (unlocks at turn 20)
+            if self.player["unlocked_features"]["heist_operations"]:
+                print(f"{option_index}. Heist operations")
+                options.append("heist_operations")
+                option_index += 1
+            
+            # Specialists (unlocks after completing 2 heists)
+            if self.player["unlocked_features"]["specialists"]:
+                print(f"{option_index}. Recruit specialists")
+                options.append("specialists")
+                option_index += 1
+            
+            # Special items (unlocks after recruiting 2 specialists)
+            if self.player["unlocked_features"]["special_items"]:
+                print(f"{option_index}. Purchase special items")
+                options.append("special_items")
+                option_index += 1
+            
+            # Mini games (unlocks at turn 5)
+            if self.player["unlocked_features"]["mini_games"]:
+                print(f"{option_index}. Play mini games")
+                options.append("mini_games")
+                option_index += 1
+            
+            # Always available options
+            print(f"{option_index}. Save game")
+            options.append("save")
+            option_index += 1
+            
+            print(f"{option_index}. Quit game")
+            options.append("quit")
+            
+            choice = input(f"\nChoose an action (1-{option_index}): ")
 
-            choice = input("\nChoose an action (1-14): ")
-
+            # Basic actions always available
             if choice == "1":
                 self.start_business()
             elif choice == "2":
@@ -593,38 +643,56 @@ class MultiVerseTycoon:
                 self.fire_employee()
             elif choice == "4":
                 self.bribe_officials()
-            elif choice == "5":
-                self.jump_universe()
-            elif choice == "6":
-                self.currency_exchange_menu()
-            elif choice == "7":
-                self.quantum_business_center()
-            elif choice == "8":
-                self.view_exchange_rates()
-            elif choice == "9":
-                self.heist_operations()
-            elif choice == "10":
-                self.recruit_specialists()
-            elif choice == "11":
-                self.purchase_special_items()
-            elif choice == "12":
-                self.play_mini_games()
-            elif choice == "13":
-                self.save_game()
-            elif choice == "14":
-                confirm = input(
-                    "\nAre you sure you want to quit? Progress will be lost unless saved. (y/n): "
-                )
-                if confirm.lower() == "y":
-                    print("\nThanks for playing Multiverse Tycoon!")
-                    sys.exit()
             else:
-                print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
-                continue
+                # Process dynamic menu options
+                try:
+                    choice_index = int(choice) - 5  # Adjust for the 4 standard options
+                    
+                    if 0 <= choice_index < len(options):
+                        option = options[choice_index]
+                        
+                        if option == "universe_travel":
+                            self.jump_universe()
+                        elif option == "currency_exchange":
+                            self.currency_exchange_menu()
+                        elif option == "exchange_rates":
+                            self.view_exchange_rates()
+                        elif option == "heist_operations":
+                            self.heist_operations()
+                        elif option == "specialists":
+                            self.recruit_specialists()
+                        elif option == "special_items":
+                            self.purchase_special_items()
+                        elif option == "mini_games":
+                            self.play_mini_games()
+                        elif option == "save":
+                            self.save_game()
+                        elif option == "quit":
+                            confirm = input(
+                                "\nAre you sure you want to quit? Progress will be lost unless saved. (y/n): "
+                            )
+                            if confirm.lower() == "y":
+                                print("\nThanks for playing Multiverse Tycoon!")
+                                sys.exit()
+                    else:
+                        print("\nInvalid choice. Please try again.")
+                        time.sleep(1.5)
+                except ValueError:
+                    print("\nInvalid choice. Please enter a number.")
+                    time.sleep(1.5)
 
             # Only advance the turn if the player didn't save/quit
-            if choice not in ["6", "7"]:
+            should_advance = True
+            if choice != "1" and choice != "2" and choice != "3" and choice != "4":
+                try:
+                    choice_index = int(choice) - 5
+                    if 0 <= choice_index < len(options):
+                        if options[choice_index] == "save" or options[choice_index] == "quit":
+                            should_advance = False
+                except:
+                    pass
+                    
+            if should_advance:
                 self.advance_turn()
 
             # Check for game over conditions
@@ -949,6 +1017,12 @@ class MultiVerseTycoon:
 
     def jump_universe(self):
         """Jump to another universe."""
+        # Check if universe travel is unlocked
+        if not self.player["unlocked_features"]["universe_travel"]:
+            print("\nUniverse travel is not available yet.")
+            print("This feature will unlock as you progress through the game.")
+            input("\nPress Enter to continue...")
+            return
         current_universe_id = self.player["current_universe"]
 
         self.clear_screen()
@@ -1178,9 +1252,49 @@ class MultiVerseTycoon:
 
         return total_reduction
 
-    def dummy_method(self):
-        """Placeholder method for code organization."""
-        pass
+    def check_feature_unlocks(self):
+        """Check if any features should be unlocked based on game progress."""
+        # Unlock universe travel at turn 10
+        if self.player["turn"] >= 10 and not self.player["unlocked_features"]["universe_travel"]:
+            self.player["unlocked_features"]["universe_travel"] = True
+            print("\n🔓 New feature unlocked: Universe Travel!")
+            print("You can now jump between different universes.")
+            input("\nPress Enter to continue...")
+            
+        # Unlock currency exchange at turn 15
+        if self.player["turn"] >= 15 and not self.player["unlocked_features"]["currency_exchange"]:
+            self.player["unlocked_features"]["currency_exchange"] = True
+            print("\n🔓 New feature unlocked: Currency Exchange!")
+            print("You can now exchange currencies between universes.")
+            input("\nPress Enter to continue...")
+            
+        # Unlock mini games at turn 5
+        if self.player["turn"] >= 5 and not self.player["unlocked_features"]["mini_games"]:
+            self.player["unlocked_features"]["mini_games"] = True
+            print("\n🔓 New feature unlocked: Mini Games!")
+            print("Play games to earn extra rewards!")
+            input("\nPress Enter to continue...")
+            
+        # Unlock heist operations at turn 20
+        if self.player["turn"] >= 20 and not self.player["unlocked_features"]["heist_operations"]:
+            self.player["unlocked_features"]["heist_operations"] = True
+            print("\n🔓 New feature unlocked: Heist Operations!")
+            print("Plan and execute heists for big rewards!")
+            input("\nPress Enter to continue...")
+            
+        # Unlock specialists after completing 2 heists
+        if len(self.player["heist_history"]) >= 2 and not self.player["unlocked_features"]["specialists"]:
+            self.player["unlocked_features"]["specialists"] = True
+            print("\n🔓 New feature unlocked: Specialists Recruitment!")
+            print("Hire specialist crew members to improve your heist success rates.")
+            input("\nPress Enter to continue...")
+            
+        # Unlock special items after recruiting 2 specialists
+        if len(self.player["heist_specialists"]) >= 2 and not self.player["unlocked_features"]["special_items"]:
+            self.player["unlocked_features"]["special_items"] = True
+            print("\n🔓 New feature unlocked: Special Items!")
+            print("Purchase special equipment to help with your heists.")
+            input("\nPress Enter to continue...")
 
     def game_over(self):
         """Display game over screen and final stats."""
@@ -1254,6 +1368,12 @@ class MultiVerseTycoon:
 
     def currency_exchange_menu(self):
         """Display the currency exchange menu and handle transactions."""
+        # Check if currency exchange is unlocked
+        if not self.player["unlocked_features"]["currency_exchange"]:
+            print("\nCurrency exchange is not available yet.")
+            print("This feature will unlock as you progress through the game.")
+            input("\nPress Enter to continue...")
+            return
         universe_id = self.player["current_universe"]
         universe = self.universes[universe_id]
         player_universe_data = self.player["universes"][universe_id]
@@ -1357,6 +1477,12 @@ class MultiVerseTycoon:
 
     def view_exchange_rates(self):
         """View the exchange rates for all universes."""
+        # Check if currency exchange is unlocked
+        if not self.player["unlocked_features"]["currency_exchange"]:
+            print("\nCurrency exchange is not available yet.")
+            print("This feature will unlock as you progress through the game.")
+            input("\nPress Enter to continue...")
+            return
         self.clear_screen()
         print(self.currency_exchange.display_exchange_rates())
         input("\nPress Enter to continue...")
@@ -1536,6 +1662,12 @@ class MultiVerseTycoon:
 
     def heist_operations(self):
         """Manage heist planning and execution."""
+        # Check if heist operations are unlocked
+        if not self.player["unlocked_features"]["heist_operations"]:
+            print("\nHeist operations are not available yet.")
+            print("This feature will unlock as you progress through the game.")
+            input("\nPress Enter to continue...")
+            return
         # Check if player is on heist cooldown
         if self.player["heist_cooldown"] > 0:
             self.clear_screen()
@@ -1840,6 +1972,12 @@ class MultiVerseTycoon:
 
     def recruit_specialists(self):
         """Recruit specialists for heist operations."""
+        # Check if specialists are unlocked
+        if not self.player["unlocked_features"]["specialists"]:
+            print("\nSpecialist recruitment is not available yet.")
+            print("This feature will unlock after you've completed a few heists.")
+            input("\nPress Enter to continue...")
+            return
         universe_id = self.player["current_universe"]
         universe = self.universes[universe_id]
         player_universe_data = self.player["universes"][universe_id]
@@ -1934,6 +2072,12 @@ class MultiVerseTycoon:
 
     def purchase_special_items(self):
         """Purchase special items for heist operations."""
+        # Check if special items are unlocked
+        if not self.player["unlocked_features"]["special_items"]:
+            print("\nSpecial items are not available yet.")
+            print("This feature will unlock after you've recruited a few specialists.")
+            input("\nPress Enter to continue...")
+            return
         universe_id = self.player["current_universe"]
         universe = self.universes[universe_id]
         player_universe_data = self.player["universes"][universe_id]
@@ -2032,12 +2176,15 @@ class MultiVerseTycoon:
         universe = self.universes[universe_id]
         player_universe_data = self.player["universes"][universe_id]
 
+        # Increase the turn counter
+        self.player["turn"] += 1
+
         # Calculate and apply business income
         income = self.calculate_business_income()
 
-        # Calculate income from quantum businesses
-        self.calculate_quantum_business_income()
-
+        # Calculate income from quantum businesses (only show if it's unlocked)
+        quantum_income = 0
+        
         # Pay employee salaries
         salaries = self.pay_employee_salaries()
 
@@ -2046,9 +2193,6 @@ class MultiVerseTycoon:
 
         # Trigger a random event with probability
         self.maybe_trigger_random_event()
-
-        # Check for quantum events
-        self.check_for_quantum_events()
 
         # Reduce heist cooldown if active
         if self.player["heist_cooldown"] > 0:
@@ -2062,6 +2206,9 @@ class MultiVerseTycoon:
             if self.player["mini_game_cooldown"] == 0:
                 print("\nYou're ready to play mini games again!")
 
+        # Check for new feature unlocks
+        self.check_feature_unlocks()
+
         # Display turn summary
         self.clear_screen()
         print("\n=== Turn Summary ===")
@@ -2069,6 +2216,13 @@ class MultiVerseTycoon:
 
     def play_mini_games(self):
         """Play mini games to earn rewards."""
+        # Check if mini games are unlocked
+        if not self.player["unlocked_features"]["mini_games"]:
+            print("\nMini games are not available yet.")
+            print("This feature will unlock as you progress through the game.")
+            input("\nPress Enter to continue...")
+            return
+            
         # Check if player is on mini game cooldown
         if self.player["mini_game_cooldown"] > 0:
             self.clear_screen()

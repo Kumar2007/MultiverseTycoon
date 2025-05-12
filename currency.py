@@ -20,7 +20,9 @@ class CurrencyExchange:
             "blade_runner": 2.5,    # 2.5 Credits = 1 Quantum Credit
             "gta_v": 5.0,           # 5.0 Dollars = 1 Quantum Credit
             "mcu": 4.0,             # 4.0 USD = 1 Quantum Credit
-            # Add more universes and their exchange rates here
+            "doraemon": 120.0,      # 120.0 Yen = 1 Quantum Credit
+            "harry_potter": 0.5,    # 0.5 Galleons = 1 Quantum Credit (Galleons are very valuable)
+            "dark_netflix": 3.0     # 3.0 Euros = 1 Quantum Credit
         }
         
         # Exchange fee (percentage)

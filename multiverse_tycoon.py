@@ -8,7 +8,7 @@ import sys
 from currency import CurrencyExchange, QuantumBusinesses, QuantumEvents
 from heists import HeistSystem
 from minigames import MiniGameSystem
-from ad_rewards import AdRewardsSystem
+# Removed ad rewards import
 
 
 class MultiVerseTycoon:
@@ -35,6 +35,9 @@ class MultiVerseTycoon:
             "mini_games_won": 0,  # Total number of mini games won
             "mini_game_history": [],  # History of played mini games
             "mini_game_cooldown": 0,  # Turns until next mini game is available
+            "player_level": 1,  # Player's current level
+            "experience": 0,  # Experience points
+            "unlocked_universes": ["blade_runner"],  # List of unlocked universe IDs
             "unlocked_features": {  # Features that have been unlocked by the player
                 "universe_travel": False,  # Ability to travel between universes
                 "currency_exchange": False,  # Ability to exchange currencies
@@ -45,60 +48,42 @@ class MultiVerseTycoon:
             }
         }
 
+        # Universe data includes level requirements for unlocking
         self.universes = {
+            # Default starting universe
             "blade_runner": {
-                "name":
-                "Blade Runner",
-                "description":
-                "A dystopian future where AI businesses thrive but are highly regulated.",
-                "currency":
-                "Credits",
-                "risk_factor":
-                75,
-                "economic_traits":
-                ["High-tech", "Unstable Politics", "AI-driven"],
+                "name": "Blade Runner",
+                "description": "A dystopian future where AI businesses thrive but are highly regulated.",
+                "currency": "Credits",
+                "risk_factor": 75,
+                "level_required": 1,  # Available from the start
+                "economic_traits": ["High-tech", "Unstable Politics", "AI-driven"],
                 "businesses": {
                     "replicant_manufacturing": {
-                        "name":
-                        "Replicant Manufacturing",
-                        "cost":
-                        10000,
-                        "income_per_turn":
-                        2500,
-                        "risk_increase":
-                        10,
-                        "description":
-                        "Create synthetic humans for dangerous work."
+                        "name": "Replicant Manufacturing",
+                        "cost": 10000,
+                        "income_per_turn": 2500,
+                        "risk_increase": 10,
+                        "description": "Create synthetic humans for dangerous work."
                     },
                     "memory_implants": {
-                        "name":
-                        "Memory Implants",
-                        "cost":
-                        7500,
-                        "income_per_turn":
-                        1800,
-                        "risk_increase":
-                        5,
-                        "description":
-                        "Design and sell artificial memories for replicants."
+                        "name": "Memory Implants",
+                        "cost": 7500,
+                        "income_per_turn": 1800,
+                        "risk_increase": 5,
+                        "description": "Design and sell artificial memories for replicants."
                     },
                     "surveillance_tech": {
-                        "name":
-                        "Surveillance Tech",
-                        "cost":
-                        5000,
-                        "income_per_turn":
-                        1200,
-                        "risk_increase":
-                        3,
-                        "description":
-                        "Develop technology to track replicants and citizens."
+                        "name": "Surveillance Tech",
+                        "cost": 5000,
+                        "income_per_turn": 1200,
+                        "risk_increase": 3,
+                        "description": "Develop technology to track replicants and citizens."
                     }
                 },
                 "events": [{
                     "name": "Replicant Uprising",
-                    "description":
-                    "Your replicants are rebelling against poor working conditions!",
+                    "description": "Your replicants are rebelling against poor working conditions!",
                     "effect": {
                         "cash": -3000,
                         "danger": 20,
@@ -106,8 +91,7 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Blade Runner Investigation",
-                    "description":
-                    "Your business is being investigated by a Blade Runner.",
+                    "description": "Your business is being investigated by a Blade Runner.",
                     "effect": {
                         "cash": -1000,
                         "danger": 15,
@@ -115,8 +99,7 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Off-world Expansion",
-                    "description":
-                    "Opportunity to expand your business to off-world colonies.",
+                    "description": "Opportunity to expand your business to off-world colonies.",
                     "effect": {
                         "cash": 5000,
                         "danger": 5,
@@ -124,8 +107,7 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Corporate Favor",
-                    "description":
-                    "A Tyrell Corporation executive offers you a partnership.",
+                    "description": "A Tyrell Corporation executive offers you a partnership.",
                     "effect": {
                         "cash": 2000,
                         "danger": -10,
@@ -133,8 +115,7 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Blackout",
-                    "description":
-                    "Digital systems fail during a city-wide blackout.",
+                    "description": "Digital systems fail during a city-wide blackout.",
                     "effect": {
                         "cash": -2000,
                         "danger": 0,
@@ -143,54 +124,38 @@ class MultiVerseTycoon:
                 }]
             },
             "gta_v": {
-                "name":
-                "GTA V",
-                "description":
-                "A world of organized crime, corruption, and fast money.",
-                "currency":
-                "Dollars",
-                "risk_factor":
-                60,
-                "economic_traits":
-                ["Corruption", "Criminal Opportunities", "Fast Money"],
+                "name": "GTA V",
+                "description": "A world of organized crime, corruption, and fast money.",
+                "currency": "Dollars",
+                "risk_factor": 60,
+                "level_required": 2,  # Unlocked at level 2
+                "economic_traits": ["Corruption", "Criminal Opportunities", "Fast Money"],
                 "businesses": {
                     "nightclub": {
-                        "name":
-                        "Nightclub",
-                        "cost":
-                        15000,
-                        "income_per_turn":
-                        3500,
-                        "risk_increase":
-                        8,
-                        "description":
-                        "Run a popular nightclub as a front for criminal activities."
+                        "name": "Nightclub",
+                        "cost": 15000,
+                        "income_per_turn": 3500,
+                        "risk_increase": 8,
+                        "description": "Run a popular nightclub as a front for criminal activities."
                     },
                     "auto_shop": {
-                        "name":
-                        "Auto Shop",
-                        "cost":
-                        12000,
-                        "income_per_turn":
-                        2800,
-                        "risk_increase":
-                        5,
-                        "description":
-                        "Modify stolen cars and sell them for profit."
+                        "name": "Auto Shop",
+                        "cost": 12000,
+                        "income_per_turn": 2800,
+                        "risk_increase": 5,
+                        "description": "Modify stolen cars and sell them for profit."
                     },
                     "weapon_dealing": {
                         "name": "Weapon Dealing",
                         "cost": 20000,
                         "income_per_turn": 4500,
                         "risk_increase": 15,
-                        "description":
-                        "Trade illegal weapons on the black market."
+                        "description": "Trade illegal weapons on the black market."
                     }
                 },
                 "events": [{
                     "name": "Police Raid",
-                    "description":
-                    "The LSPD is raiding one of your businesses!",
+                    "description": "The LSPD is raiding one of your businesses!",
                     "effect": {
                         "cash": -5000,
                         "danger": 25,
@@ -198,8 +163,7 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Gang War",
-                    "description":
-                    "Local gangs are fighting in your territory.",
+                    "description": "Local gangs are fighting in your territory.",
                     "effect": {
                         "cash": -3000,
                         "danger": 15,
@@ -207,8 +171,7 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Heist Opportunity",
-                    "description":
-                    "You've been invited to participate in a major bank heist.",
+                    "description": "You've been invited to participate in a major bank heist.",
                     "effect": {
                         "cash": 10000,
                         "danger": 20,
@@ -216,8 +179,7 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Corrupt Official",
-                    "description":
-                    "A police officer offers protection for your businesses.",
+                    "description": "A police officer offers protection for your businesses.",
                     "effect": {
                         "cash": -2000,
                         "danger": -15,
@@ -225,8 +187,7 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Celebrity Client",
-                    "description":
-                    "A famous celebrity becomes a regular at your establishment.",
+                    "description": "A famous celebrity becomes a regular at your establishment.",
                     "effect": {
                         "cash": 3000,
                         "danger": 0,
@@ -235,58 +196,38 @@ class MultiVerseTycoon:
                 }]
             },
             "mcu": {
-                "name":
-                "MCU",
-                "description":
-                "A world of superheroes, advanced technology, and constant innovation.",
-                "currency":
-                "USD",
-                "risk_factor":
-                50,
-                "economic_traits":
-                ["High Innovation", "Superhero Interference", "Tech-driven"],
+                "name": "MCU",
+                "description": "A world of superheroes, advanced technology, and constant innovation.",
+                "currency": "USD",
+                "risk_factor": 50,
+                "level_required": 3,  # Unlocked at level 3
+                "economic_traits": ["High Innovation", "Superhero Interference", "Tech-driven"],
                 "businesses": {
                     "stark_tech_competitor": {
-                        "name":
-                        "Stark Tech Competitor",
-                        "cost":
-                        25000,
-                        "income_per_turn":
-                        5000,
-                        "risk_increase":
-                        7,
-                        "description":
-                        "Develop advanced technology to compete with Stark Industries."
+                        "name": "Stark Tech Competitor",
+                        "cost": 25000,
+                        "income_per_turn": 5000,
+                        "risk_increase": 7,
+                        "description": "Develop advanced technology to compete with Stark Industries."
                     },
                     "superhero_insurance": {
-                        "name":
-                        "Superhero Insurance",
-                        "cost":
-                        15000,
-                        "income_per_turn":
-                        3000,
-                        "risk_increase":
-                        3,
-                        "description":
-                        "Provide insurance against damage caused by superhero battles."
+                        "name": "Superhero Insurance",
+                        "cost": 15000,
+                        "income_per_turn": 3000,
+                        "risk_increase": 3,
+                        "description": "Provide insurance against damage caused by superhero battles."
                     },
                     "shield_supplies": {
-                        "name":
-                        "S.H.I.E.L.D. Supplies",
-                        "cost":
-                        20000,
-                        "income_per_turn":
-                        4000,
-                        "risk_increase":
-                        5,
-                        "description":
-                        "Supply equipment and technology to S.H.I.E.L.D. agents."
+                        "name": "S.H.I.E.L.D. Supplies",
+                        "cost": 20000,
+                        "income_per_turn": 4000,
+                        "risk_increase": 5,
+                        "description": "Supply equipment and technology to S.H.I.E.L.D. agents."
                     }
                 },
                 "events": [{
                     "name": "Avengers Battle",
-                    "description":
-                    "A battle between The Avengers and a villain destroyed part of your business!",
+                    "description": "A battle between The Avengers and a villain destroyed part of your business!",
                     "effect": {
                         "cash": -6000,
                         "danger": 10,
@@ -294,8 +235,7 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Stark Partnership",
-                    "description":
-                    "Tony Stark offers to collaborate on a new technology.",
+                    "description": "Tony Stark offers to collaborate on a new technology.",
                     "effect": {
                         "cash": 8000,
                         "danger": -5,
@@ -303,8 +243,7 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Alien Artifact",
-                    "description":
-                    "You discovered an alien artifact with valuable technology.",
+                    "description": "You discovered an alien artifact with valuable technology.",
                     "effect": {
                         "cash": 5000,
                         "danger": 15,
@@ -312,8 +251,7 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Government Scrutiny",
-                    "description":
-                    "Your business is being investigated for potential Hydra connections.",
+                    "description": "Your business is being investigated for potential Hydra connections.",
                     "effect": {
                         "cash": -2000,
                         "danger": 10,
@@ -321,12 +259,228 @@ class MultiVerseTycoon:
                     }
                 }, {
                     "name": "Multiverse Entrepreneur Award",
-                    "description":
-                    "Your innovative business model wins a prestigious award.",
+                    "description": "Your innovative business model wins a prestigious award.",
                     "effect": {
                         "cash": 3000,
                         "danger": 0,
                         "reputation": 15
+                    }
+                }]
+            },
+            # New worlds as requested
+            "doraemon": {
+                "name": "Doraemon",
+                "description": "A world where futuristic gadgets from the 22nd century help solve everyday problems.",
+                "currency": "Yen",
+                "risk_factor": 40,
+                "level_required": 4,  # Unlocked at level 4
+                "economic_traits": ["Future Technology", "Kid-Friendly", "Gadget-Based"],
+                "businesses": {
+                    "gadget_shop": {
+                        "name": "Future Gadget Shop",
+                        "cost": 20000,
+                        "income_per_turn": 4000,
+                        "risk_increase": 5,
+                        "description": "Sell unique gadgets from the 22nd century to help with daily life."
+                    },
+                    "anywhere_door_transport": {
+                        "name": "Anywhere Door Transport",
+                        "cost": 30000,
+                        "income_per_turn": 6000,
+                        "risk_increase": 10,
+                        "description": "Provide instantaneous transportation services to any location."
+                    },
+                    "time_machine_tours": {
+                        "name": "Time Machine Tours",
+                        "cost": 40000,
+                        "income_per_turn": 8000,
+                        "risk_increase": 15,
+                        "description": "Offer guided historical tours through different time periods."
+                    }
+                },
+                "events": [{
+                    "name": "Gadget Malfunction",
+                    "description": "One of your futuristic gadgets has gone haywire!",
+                    "effect": {
+                        "cash": -4000,
+                        "danger": 15,
+                        "reputation": -5
+                    }
+                }, {
+                    "name": "Rival Inventor",
+                    "description": "A jealous inventor tries to sabotage your technology.",
+                    "effect": {
+                        "cash": -3000,
+                        "danger": 10,
+                        "reputation": -10
+                    }
+                }, {
+                    "name": "Temporal Agency Inspection",
+                    "description": "The Time Patrol is inspecting your time machine tours for regulations compliance.",
+                    "effect": {
+                        "cash": -2000,
+                        "danger": 5,
+                        "reputation": 0
+                    }
+                }, {
+                    "name": "Future Tech Award",
+                    "description": "Your gadget innovations win a prestigious award from the 22nd century.",
+                    "effect": {
+                        "cash": 5000,
+                        "danger": 0,
+                        "reputation": 20
+                    }
+                }, {
+                    "name": "Special Customer",
+                    "description": "A mysterious blue cat robot becomes a loyal customer and promoter.",
+                    "effect": {
+                        "cash": 3000,
+                        "danger": -10,
+                        "reputation": 15
+                    }
+                }]
+            },
+            "harry_potter": {
+                "name": "Wizarding World",
+                "description": "A hidden magical society with its own economy, government, and educational system.",
+                "currency": "Galleons",
+                "risk_factor": 65,
+                "level_required": 5,  # Unlocked at level 5
+                "economic_traits": ["Magic-Powered", "Secretive", "Traditional"],
+                "businesses": {
+                    "wand_shop": {
+                        "name": "Wand Crafting",
+                        "cost": 25000,
+                        "income_per_turn": 5500,
+                        "risk_increase": 8,
+                        "description": "Craft and sell magical wands to witches and wizards."
+                    },
+                    "potion_brewery": {
+                        "name": "Potion Brewery",
+                        "cost": 20000,
+                        "income_per_turn": 4500,
+                        "risk_increase": 12,
+                        "description": "Brew and sell various magical potions for any need."
+                    },
+                    "magical_creatures_sanctuary": {
+                        "name": "Magical Creatures Sanctuary",
+                        "cost": 35000,
+                        "income_per_turn": 7000,
+                        "risk_increase": 15,
+                        "description": "Care for and study magical creatures while offering tours to visitors."
+                    }
+                },
+                "events": [{
+                    "name": "Ministry Raid",
+                    "description": "The Ministry of Magic is investigating your business for illegal magical artifacts.",
+                    "effect": {
+                        "cash": -5000,
+                        "danger": 20,
+                        "reputation": -10
+                    }
+                }, {
+                    "name": "Dark Wizard Threat",
+                    "description": "Dark wizards are threatening your business unless you pay protection money.",
+                    "effect": {
+                        "cash": -4000,
+                        "danger": 15,
+                        "reputation": -5
+                    }
+                }, {
+                    "name": "Magical Mishap",
+                    "description": "A spell gone wrong has caused chaos in your establishment.",
+                    "effect": {
+                        "cash": -3000,
+                        "danger": 10,
+                        "reputation": 0
+                    }
+                }, {
+                    "name": "Famous Wizard Visit",
+                    "description": "A famous wizard publicly endorses your business.",
+                    "effect": {
+                        "cash": 6000,
+                        "danger": 0,
+                        "reputation": 20
+                    }
+                }, {
+                    "name": "Magical Innovation",
+                    "description": "You've discovered a new magical process that revolutionizes your industry.",
+                    "effect": {
+                        "cash": 8000,
+                        "danger": 5,
+                        "reputation": 15
+                    }
+                }]
+            },
+            "dark_netflix": {
+                "name": "Dark (Netflix)",
+                "description": "A world where time travel connects multiple generations across different eras in a complex web of cause and effect.",
+                "currency": "Euros",
+                "risk_factor": 80,
+                "level_required": 6,  # Unlocked at level 6
+                "economic_traits": ["Time-Influenced", "Paradox-Prone", "Mysterious"],
+                "businesses": {
+                    "temporal_consultancy": {
+                        "name": "Temporal Consultancy",
+                        "cost": 40000,
+                        "income_per_turn": 8000,
+                        "risk_increase": 20,
+                        "description": "Provide strategic advice to clients across different time periods."
+                    },
+                    "nuclear_power": {
+                        "name": "Nuclear Power Research",
+                        "cost": 50000,
+                        "income_per_turn": 10000,
+                        "risk_increase": 25,
+                        "description": "Research advanced nuclear technology with help from different time periods."
+                    },
+                    "cave_expeditions": {
+                        "name": "Winden Cave Tours",
+                        "cost": 30000,
+                        "income_per_turn": 6000,
+                        "risk_increase": 15,
+                        "description": "Guide special tours through the mysterious cave system (avoiding the time portal)."
+                    }
+                },
+                "events": [{
+                    "name": "Temporal Paradox",
+                    "description": "A paradox has occurred affecting your business across multiple time periods!",
+                    "effect": {
+                        "cash": -8000,
+                        "danger": 30,
+                        "reputation": -15
+                    }
+                }, {
+                    "name": "Prophet's Warning",
+                    "description": "A mysterious old man warns you of impending apocalypse.",
+                    "effect": {
+                        "cash": -3000,
+                        "danger": 20,
+                        "reputation": -5
+                    }
+                }, {
+                    "name": "Time Travel Incident",
+                    "description": "An employee accidentally traveled through time and altered something.",
+                    "effect": {
+                        "cash": -5000,
+                        "danger": 25,
+                        "reputation": -10
+                    }
+                }, {
+                    "name": "Future Investment",
+                    "description": "Someone from the future has invested heavily in your business.",
+                    "effect": {
+                        "cash": 10000,
+                        "danger": 10,
+                        "reputation": 10
+                    }
+                }, {
+                    "name": "Temporal Loop Advantage",
+                    "description": "You've managed to exploit knowledge from a time loop for business gain.",
+                    "effect": {
+                        "cash": 12000,
+                        "danger": 15,
+                        "reputation": 5
                     }
                 }]
             }
@@ -377,9 +531,6 @@ class MultiVerseTycoon:
         
         # Initialize mini game system
         self.mini_game_system = MiniGameSystem()
-        
-        # Initialize ad rewards system
-        self.ad_rewards_system = AdRewardsSystem()
 
     def clear_screen(self):
         """Clear the terminal screen."""
@@ -482,17 +633,38 @@ class MultiVerseTycoon:
         # Start in the Blade Runner universe
         self.player["current_universe"] = "blade_runner"
 
-        self.slow_print(
-            f"\nWelcome, {player_name}! You are now an entrepreneur in the multiverse."
-        )
-        self.slow_print(
-            "You'll start your journey in the Blade Runner universe.")
-        self.slow_print(
-            "Your goal is to build businesses across multiple universes and become a multiverse tycoon!"
-        )
-        self.slow_print(
-            "But be careful - if your danger level reaches 100 in any universe, you'll be caught!"
-        )
+        # Core narrative introduction
+        self.clear_screen()
+        print("\n=== THE QUANTUM CORPORATION ===\n")
+        
+        self.slow_print("CONFIDENTIAL TRANSMISSION")
+        self.slow_print("FROM: Dr. Eleanor Quantum, Founder & CEO")
+        self.slow_print(f"TO: {player_name}, Special Operative\n")
+        
+        self.slow_print("Welcome to the Quantum Corporation's Multiverse Division.")
+        self.slow_print("As you know, our discovery of the Quantum Nexus has allowed us to access")
+        self.slow_print("multiple parallel realities, each with their own unique characteristics.")
+        
+        self.slow_print("\nYour mission is of the utmost importance:")
+        self.slow_print("1. Establish business operations across these universes")
+        self.slow_print("2. Gather Quantum Credits - the only currency that maintains value across all realities")
+        self.slow_print("3. Build a network that will allow us to stabilize the fracturing multiverse")
+        
+        self.slow_print("\nOur scientists have detected dangerous instabilities in the multiverse fabric.")
+        self.slow_print("These interdimensional fluctuations threaten to collapse all realities into one.")
+        self.slow_print("Only by establishing a network of businesses across multiple universes")
+        self.slow_print("can we generate enough Quantum Credits to power our stabilization technology.")
+        
+        self.slow_print("\nYou'll begin in the Blade Runner universe - a dystopian future where")
+        self.slow_print("AI technology thrives but is highly regulated. As you progress,")
+        self.slow_print("you'll gain access to other universes, each with their own unique")
+        self.slow_print("challenges and opportunities.")
+        
+        self.slow_print("\nBe cautious - if your activities draw too much attention in any universe,")
+        self.slow_print("local authorities will detect your interdimensional nature,")
+        self.slow_print("forcing a permanent retreat from that reality.")
+        
+        self.slow_print("\nThe fate of all realities rests in your hands. Good luck, Tycoon.")
 
         input("\nPress Enter to begin your adventure...")
         self.main_game_loop()
@@ -587,17 +759,38 @@ class MultiVerseTycoon:
         player_universe_data = self.player["universes"][universe_id]
 
         self.clear_screen()
-        print(f"\n=== {universe['name']} Universe ===")
+        
+        # Quantum Corporation mission header
+        print("\n=== QUANTUM CORPORATION ===")
+        print("Multiverse Stabilization Initiative")
+        print(f"Operative: {self.player['name']}")
+        print(f"Field Agent Level: {self.player['player_level']}")
+        print(f"Experience: {self.player['experience']} / {self.player['player_level'] * 1000} XP")
+        
+        # Universe information
+        print(f"\n=== {universe['name']} - Reality Designation ===")
         print(f"Description: {universe['description']}")
-        print(f"Currency: {universe['currency']}")
-        print(f"Risk Factor: {universe['risk_factor']}/100")
-        print(f"Economic Traits: {', '.join(universe['economic_traits'])}")
+        print(f"Local Currency: {universe['currency']}")
+        print(f"Instability Index: {universe['risk_factor']}/100")
+        print(f"Economic Factors: {', '.join(universe['economic_traits'])}")
 
-        print("\n=== Your Status ===")
-        print(f"Cash: {player_universe_data['cash']} {universe['currency']}")
+        # Mission status
+        print("\n=== Operation Status ===")
+        print(f"Local Resources: {player_universe_data['cash']} {universe['currency']}")
         print(f"Quantum Credits: {self.player['quantum_credits']} Q¢")
-        print(f"Danger Level: {player_universe_data['danger']}/100")
-        print(f"Reputation: {player_universe_data['reputation']}")
+        print(f"Detection Risk: {player_universe_data['danger']}/100")
+        print(f"Local Influence: {player_universe_data['reputation']}")
+        
+        # Network statistics
+        print(f"\nNetwork Status: {sum(len(universe_data['businesses']) for universe_data in self.player['universes'].values())} business nodes")
+        print(f"Network Spread: {sum(1 for universe_data in self.player['universes'].values() if len(universe_data['businesses']) > 0)}/{len(self.player['unlocked_universes'])} universes")
+        print(f"Mission Cycle: {self.player['turn']}")
+        
+        # Alert if danger level is getting high
+        if player_universe_data['danger'] >= 80:
+            print("\n⚠️ WARNING: Detection risk critical! Consider stabilizing operations or relocating.")
+        elif player_universe_data['danger'] >= 60:
+            print("\n⚠️ CAUTION: Detection risk elevated. Monitor situation closely.")
 
         if player_universe_data['businesses']:
             print("\n=== Your Businesses ===")
@@ -677,10 +870,7 @@ class MultiVerseTycoon:
                 options.append("mini_games")
                 option_index += 1
                 
-            # Ad rewards (always available)
-            print(f"{option_index}. Ad rewards")
-            options.append("ad_rewards")
-            option_index += 1
+            # Ad rewards option removed
             
             # Always available options
             print(f"{option_index}. Save game")
@@ -723,8 +913,7 @@ class MultiVerseTycoon:
                             self.purchase_special_items()
                         elif option == "mini_games":
                             self.play_mini_games()
-                        elif option == "ad_rewards":
-                            self.ad_rewards_menu()
+                        # Ad rewards option removed
                         elif option == "save":
                             self.save_game()
                         elif option == "quit":
@@ -1092,20 +1281,25 @@ class MultiVerseTycoon:
 
         # Display available universes
         print("\nAvailable Universes:")
-        for i, (universe_id, universe) in enumerate(self.universes.items(), 1):
-            if universe_id != current_universe_id:
-                player_universe_data = self.player["universes"][universe_id]
-                print(f"{i}. {universe['name']}")
-                print(
-                    f"   Cash: {player_universe_data['cash']} {universe['currency']}"
-                )
-                print(f"   Danger Level: {player_universe_data['danger']}/100")
-                print(
-                    f"   Businesses: {len(player_universe_data['businesses'])}"
-                )
-                print(
-                    f"   Employees: {len(player_universe_data['employees'])}\n"
-                )
+        available_universes = []
+        
+        # Only show unlocked universes
+        for universe_id, universe in self.universes.items():
+            if universe_id != current_universe_id and universe_id in self.player["unlocked_universes"]:
+                available_universes.append((universe_id, universe))
+        
+        if not available_universes:
+            print("No other universes available yet! Continue playing to unlock new worlds.")
+            input("\nPress Enter to continue...")
+            return
+            
+        for i, (universe_id, universe) in enumerate(available_universes, 1):
+            player_universe_data = self.player["universes"][universe_id]
+            print(f"{i}. {universe['name']}")
+            print(f"   Cash: {player_universe_data['cash']} {universe['currency']}")
+            print(f"   Danger Level: {player_universe_data['danger']}/100")
+            print(f"   Businesses: {len(player_universe_data['businesses'])}")
+            print(f"   Employees: {len(player_universe_data['employees'])}\n")
 
         print(f"{len(self.universes) + 1}. Cancel")
 
@@ -1255,14 +1449,7 @@ class MultiVerseTycoon:
 
         total_income += employee_bonus
         
-        # Apply ad reward multipliers if any are active
-        ad_reward_multiplier = self.apply_ad_reward_effects()
-        if ad_reward_multiplier > 1.0:
-            original_income = total_income
-            total_income *= ad_reward_multiplier
-            print(f"\n💰 Ad reward bonus applied! Income multiplier: x{ad_reward_multiplier}")
-            print(f"   Original income: {int(original_income)} {universe['currency']}")
-            print(f"   Boosted income: {int(total_income)} {universe['currency']}")
+        # Ad reward system removed
 
         # Apply income
         player_universe_data["cash"] += int(total_income)
@@ -1351,6 +1538,9 @@ class MultiVerseTycoon:
             print("Plan and execute heists for big rewards!")
             input("\nPress Enter to continue...")
             
+        # Check for level ups and universe unlocks
+        self.check_level_up()
+            
         # Unlock specialists after completing 2 heists
         if len(self.player["heist_history"]) >= 2 and not self.player["unlocked_features"]["specialists"]:
             self.player["unlocked_features"]["specialists"] = True
@@ -1365,6 +1555,62 @@ class MultiVerseTycoon:
             print("Purchase special equipment to help with your heists.")
             input("\nPress Enter to continue...")
 
+    def check_level_up(self):
+        """Check if player should level up and unlock new universes."""
+        # Calculate XP threshold for next level (increases with each level)
+        xp_threshold = self.player["player_level"] * 1000
+        
+        # Check if player has enough XP to level up
+        if self.player["experience"] >= xp_threshold:
+            # Level up
+            old_level = self.player["player_level"]
+            self.player["player_level"] += 1
+            self.player["experience"] -= xp_threshold  # Reset XP counter (keeping extra XP)
+            
+            # Notify player
+            self.clear_screen()
+            print("\n🌟 LEVEL UP! 🌟")
+            print(f"You've reached level {self.player['player_level']}!")
+            
+            # Check for newly unlocked universes
+            newly_unlocked = []
+            for universe_id, universe in self.universes.items():
+                if (universe["level_required"] == self.player["player_level"] and 
+                    universe_id not in self.player["unlocked_universes"]):
+                    # Unlock this universe
+                    self.player["unlocked_universes"].append(universe_id)
+                    
+                    # Initialize player state for this universe
+                    if universe_id not in self.player["universes"]:
+                        self.player["universes"][universe_id] = {
+                            "cash": self.starting_cash,
+                            "danger": 0,
+                            "reputation": 0,
+                            "businesses": [],
+                            "employees": []
+                        }
+                    
+                    newly_unlocked.append(universe)
+            
+            # Notify about new universes
+            if newly_unlocked:
+                print("\n🌌 NEW UNIVERSES UNLOCKED! 🌌")
+                for universe in newly_unlocked:
+                    print(f"\n• {universe['name']}")
+                    print(f"  {universe['description']}")
+                
+                print("\nYou can now travel to these new universes and build businesses there!")
+            
+            # Extra rewards for leveling up
+            bonus_quantum = self.player["player_level"] * 50
+            self.player["quantum_credits"] += bonus_quantum
+            print(f"\nBonus reward: {bonus_quantum} Quantum Credits!")
+            
+            input("\nPress Enter to continue...")
+            return True
+        
+        return False
+        
     def game_over(self):
         """Display game over screen and final stats."""
         self.clear_screen()
@@ -1378,12 +1624,41 @@ class MultiVerseTycoon:
          ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝     ╚═════╝   ╚═══╝  ╚══════╝╚═╝  ╚═╝
         """)
 
-        self.slow_print(f"\nReason: {self.player['end_reason']}")
-
+        print("\n=== QUANTUM CORPORATION MISSION REPORT ===\n")
+        self.slow_print("TRANSMISSION INTERRUPTED")
+        self.slow_print(f"Field Operative: {self.player['name']}")
+        
+        self.slow_print(f"\nMission Status: TERMINATED")
+        self.slow_print(f"Reason: {self.player['end_reason']}")
+        
+        # Narrative based on performance
+        self.slow_print("\nDr. Eleanor Quantum's Assessment:")
+        
+        total_quantum = self.player["quantum_credits"]
+        total_businesses_all = sum(len(universe_data['businesses']) for universe_data in self.player["universes"].values())
+        universes_with_businesses = sum(1 for universe_data in self.player["universes"].values() if len(universe_data['businesses']) > 0)
+        
+        if total_quantum > 1000 and total_businesses_all > 10 and universes_with_businesses >= 3:
+            self.slow_print("Despite your mission's end, your significant contributions to our")
+            self.slow_print("interdimensional network have provided valuable data. The quantum credits")
+            self.slow_print("you've accumulated will power our stabilization efforts for some time.")
+            self.slow_print("We'll dispatch another operative to continue your work.")
+        elif total_quantum > 500 or total_businesses_all > 5:
+            self.slow_print("Your efforts showed promise, but ultimately fell short of what we needed.")
+            self.slow_print("The multiverse stabilization project will continue with another operative.")
+            self.slow_print("We've archived your strategies for future reference.")
+        else:
+            self.slow_print("Your premature mission failure has set our stabilization efforts back significantly.")
+            self.slow_print("The Quantum Corporation will need to reassess our approach to interdimensional")
+            self.slow_print("business ventures. We can only hope the multiverse holds together long enough")
+            self.slow_print("for us to implement a new strategy.")
+        
         # Display final stats
-        print("\n=== Final Stats ===")
-        print(f"Entrepreneur: {self.player['name']}")
-        print(f"Turns Survived: {self.player['turn']}")
+        print("\n=== Mission Statistics ===")
+        print(f"Operative: {self.player['name']}")
+        print(f"Mission Duration: {self.player['turn']} cycles")
+        print(f"Final Level: {self.player['player_level']}")
+        print(f"Experience Points: {self.player['experience']}")
 
         total_wealth = 0
         total_businesses = 0
@@ -2274,6 +2549,15 @@ class MultiVerseTycoon:
             self.player["mini_game_cooldown"] -= 1
             if self.player["mini_game_cooldown"] == 0:
                 print("\nYou're ready to play mini games again!")
+        
+        # Award experience points based on actions this turn
+        base_xp = 100  # Base XP for completing a turn
+        business_xp = len(player_universe_data["businesses"]) * 20  # XP for each business owned
+        employee_xp = len(player_universe_data["employees"]) * 15  # XP for each employee
+        income_xp = int(income / 1000) * 10  # XP based on income (10 XP per 1000 currency)
+        
+        total_xp_gained = base_xp + business_xp + employee_xp + income_xp
+        self.player["experience"] += total_xp_gained
 
         # Check for new feature unlocks
         self.check_feature_unlocks()
@@ -2281,6 +2565,9 @@ class MultiVerseTycoon:
         # Display turn summary
         self.clear_screen()
         print("\n=== Turn Summary ===")
+        print(f"Experience gained: {total_xp_gained} XP")
+        print(f"Total XP: {self.player['experience']} / " + 
+              f"{self.player['player_level'] * 1000} for next level")
 
 
     def play_mini_games(self):
@@ -2432,114 +2719,7 @@ class MultiVerseTycoon:
         
         input("\nPress Enter to continue...")
     
-    def ad_rewards_menu(self):
-        """Display and handle the ad rewards menu."""
-        while True:
-            self.clear_screen()
-            
-            # Display a header
-            print("\n=== Ad Rewards System ===")
-            print("Boost your progress by watching ads or redeeming codes!")
-            
-            # Show active boosts
-            active_boosts = self.ad_rewards_system.get_active_boosts()
-            if active_boosts:
-                print("\n=== Active Boosts ===")
-                for boost in active_boosts:
-                    print(f"• {boost['name']} - {boost['turns_remaining']} turns remaining")
-            else:
-                print("\nNo active boosts at the moment.")
-                
-            # Show menu options
-            print("\nOptions:")
-            print("1. Watch an ad for a random reward")
-            print("2. Redeem a reward code")
-            print("3. About ad rewards")
-            print("4. Back to main menu")
-            
-            choice = input("\nSelect an option (1-4): ")
-            
-            if choice == "1":
-                self.watch_ad_for_reward()
-            elif choice == "2":
-                self.redeem_reward_code()
-            elif choice == "3":
-                self.display_ad_rewards_info()
-            elif choice == "4":
-                break
-            else:
-                print("\nInvalid choice. Please try again.")
-                input("\nPress Enter to continue...")
-    
-    def watch_ad_for_reward(self):
-        """Simulate watching an ad and receive a reward."""
-        self.clear_screen()
-        print("\n=== Watch Ad for Reward ===")
-        print("Watching an ad will get you a random reward.")
-        print("You can do this once every 12 hours in real time.")
-        
-        confirm = input("\nWould you like to watch an ad now? (y/n): ")
-        
-        if confirm.lower() == "y":
-            print("\nSimulating ad watching...")
-            for _ in range(5):
-                time.sleep(0.5)
-                print(".", end="", flush=True)
-            print()
-            
-            # Process the ad watch
-            success, message = self.ad_rewards_system.watch_ad_for_reward(self.player)
-            
-            if success:
-                print(f"\n✓ {message}")
-            else:
-                print(f"\n✗ {message}")
-        
-        input("\nPress Enter to continue...")
-    
-    def redeem_reward_code(self):
-        """Allow the player to enter and redeem a reward code."""
-        self.clear_screen()
-        print("\n=== Redeem Reward Code ===")
-        print("Enter a valid reward code to receive special bonuses.")
-        
-        code = input("\nEnter reward code (or type 'back' to return): ")
-        
-        if code.lower() == "back":
-            return
-            
-        # Process the code redemption
-        success, message = self.ad_rewards_system.redeem_code(self.player, code)
-        
-        if success:
-            print(f"\n✓ {message}")
-        else:
-            print(f"\n✗ {message}")
-        
-        input("\nPress Enter to continue...")
-    
-    def display_ad_rewards_info(self):
-        """Display information about possible ad rewards."""
-        self.clear_screen()
-        print("\n=== About Ad Rewards ===")
-        print("The ad rewards system allows you to earn special bonuses by:")
-        print("1. Watching ads (simulated in this version)")
-        print("2. Redeeming special codes you may receive")
-        
-        print("\nPossible rewards include:")
-        
-        # Display information about rewards
-        for reward_id, reward_data in self.ad_rewards_system.rewards.items():
-            print(f"\n• {reward_data['name']}")
-            print(f"  {reward_data['description']}")
-        
-        input("\nPress Enter to continue...")
-    
-    def apply_ad_reward_effects(self):
-        """Apply the effects of active ad rewards."""
-        # Get the multiplier for cash income
-        cash_multiplier = self.ad_rewards_system.update_turn(self.player)
-        return cash_multiplier
+    # All ad rewards related functions removed
 
 
 if __name__ == "__main__":

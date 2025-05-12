@@ -9,15 +9,15 @@ import sys
 class MultiVerseTycoon:
     def __init__(self):
         """Initialize the game with default settings."""
-        from achievements import AchievementSystem
-        self.achievement_system = AchievementSystem()
         self.player = {
             "name": "",
             "universes": {},
             "current_universe": None,
             "turn": 1,
             "game_over": False,
-            "end_reason": ""
+            "end_reason": "",
+            "event_history": {},
+            "last_event_turn": 0
         }
         
         self.universes = {
@@ -363,13 +363,7 @@ class MultiVerseTycoon:
         universe = self.universes[universe_id]
         player_universe_data = self.player["universes"][universe_id]
         
-        # Display unlocked achievements
-        unlocked = [ach for ach in self.achievement_system.achievements.values() if ach.unlocked]
-        if unlocked:
-            print("\n=== Achievements Unlocked ===")
-            for achievement in unlocked:
-                print(f"✓ {achievement.name} - {achievement.description}")
-        
+
         self.clear_screen()
         print(f"\n=== {universe['name']} Universe ===")
         print(f"Description: {universe['description']}")
@@ -671,14 +665,62 @@ class MultiVerseTycoon:
             time.sleep(1.5)
             self.jump_universe()
         
+    def maybe_trigger_random_event(self):
+        """Decide whether to trigger a random event based on probability."""
+        # Event cooldown - minimum turns between events
+        EVENT_COOLDOWN = 2
+        # Base probability of event occurring (30%)
+        EVENT_PROBABILITY = 0.3
+        
+        universe_id = self.player["current_universe"]
+        current_turn = self.player["turn"]
+        
+        # Initialize event history for this universe if not present
+        if universe_id not in self.player["event_history"]:
+            self.player["event_history"][universe_id] = []
+        
+        # Check if enough turns have passed since last event
+        turns_since_last_event = current_turn - self.player["last_event_turn"]
+        if turns_since_last_event < EVENT_COOLDOWN:
+            return
+            
+        # Calculate probability based on danger level
+        player_universe_data = self.player["universes"][universe_id]
+        danger_level = player_universe_data["danger"] 
+        # Increase probability based on danger (up to +20%)
+        adjusted_probability = EVENT_PROBABILITY + (danger_level / 500)  
+        
+        # Roll the dice - if random value is less than probability, trigger event
+        if random.random() < adjusted_probability:
+            self.trigger_random_event()
+            self.player["last_event_turn"] = current_turn
+            
     def trigger_random_event(self):
         """Trigger a random event from the current universe's event pool."""
         universe_id = self.player["current_universe"]
         universe = self.universes[universe_id]
         player_universe_data = self.player["universes"][universe_id]
         
-        # Select a random event from the universe's event pool
-        event = random.choice(universe["events"])
+        # Get list of recent events to avoid repetition
+        recent_events = self.player["event_history"].get(universe_id, [])[-3:]  # Last 3 events
+        
+        # Filter out recently occurred events if possible
+        available_events = [e for e in universe["events"] if e["name"] not in recent_events]
+        
+        # If all events were recently used, fall back to all events
+        if not available_events:
+            available_events = universe["events"]
+        
+        # Add weighting based on rarity
+        # For now, equal weighting, but could be expanded
+        event = random.choice(available_events)
+        
+        # Record this event
+        self.player["event_history"].setdefault(universe_id, []).append(event["name"])
+        
+        # Keep history manageable
+        while len(self.player["event_history"][universe_id]) > 10:
+            self.player["event_history"][universe_id].pop(0)
         
         self.clear_screen()
         print("\n=== MULTIVERSE RIFT EVENT ===")
@@ -791,9 +833,6 @@ class MultiVerseTycoon:
         universe = self.universes[universe_id]
         player_universe_data = self.player["universes"][universe_id]
         
-        # Check achievements
-        self.achievement_system.check_achievements(self.player)
-        
         # Calculate and apply business income
         income = self.calculate_business_income()
         
@@ -803,8 +842,8 @@ class MultiVerseTycoon:
         # Apply danger reductions from employees
         danger_reduction = self.apply_danger_reductions()
         
-        # Trigger a random event
-        self.trigger_random_event()
+        # Trigger a random event with probability
+        self.maybe_trigger_random_event()
         
         # Display turn summary
         self.clear_screen()

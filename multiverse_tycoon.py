@@ -9,6 +9,8 @@ import sys
 class MultiVerseTycoon:
     def __init__(self):
         """Initialize the game with default settings."""
+        from achievements import AchievementSystem
+        self.achievement_system = AchievementSystem()
         self.player = {
             "name": "",
             "universes": {},
@@ -360,6 +362,13 @@ class MultiVerseTycoon:
         universe_id = self.player["current_universe"]
         universe = self.universes[universe_id]
         player_universe_data = self.player["universes"][universe_id]
+        
+        # Display unlocked achievements
+        unlocked = [ach for ach in self.achievement_system.achievements.values() if ach.unlocked]
+        if unlocked:
+            print("\n=== Achievements Unlocked ===")
+            for achievement in unlocked:
+                print(f"✓ {achievement.name} - {achievement.description}")
         
         self.clear_screen()
         print(f"\n=== {universe['name']} Universe ===")
@@ -781,6 +790,9 @@ class MultiVerseTycoon:
         universe_id = self.player["current_universe"]
         universe = self.universes[universe_id]
         player_universe_data = self.player["universes"][universe_id]
+        
+        # Check achievements
+        self.achievement_system.check_achievements(self.player)
         
         # Calculate and apply business income
         income = self.calculate_business_income()

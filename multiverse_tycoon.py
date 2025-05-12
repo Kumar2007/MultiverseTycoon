@@ -8,6 +8,7 @@ import sys
 from currency import CurrencyExchange, QuantumBusinesses, QuantumEvents
 from heists import HeistSystem
 from minigames import MiniGameSystem
+from ad_rewards import AdRewardsSystem
 
 
 class MultiVerseTycoon:
@@ -376,6 +377,9 @@ class MultiVerseTycoon:
         
         # Initialize mini game system
         self.mini_game_system = MiniGameSystem()
+        
+        # Initialize ad rewards system
+        self.ad_rewards_system = AdRewardsSystem()
 
     def clear_screen(self):
         """Clear the terminal screen."""
@@ -439,9 +443,22 @@ class MultiVerseTycoon:
         elif choice == "3":
             print("\nThanks for playing Multiverse Tycoon!")
             sys.exit()
+        elif choice.lower() == "admin":  # Secret admin access
+            self.admin_tools()
         else:
             print("\nInvalid choice. Please try again.")
             time.sleep(0.75)  # Reduced delay for faster gameplay
+            self.start_game()
+            
+    def admin_tools(self):
+        """Access admin tools for developers and debugging."""
+        try:
+            import admin_tools
+            admin_tools.admin_menu()
+            self.start_game()
+        except ImportError:
+            print("\nAdmin tools not found. This feature is only for developers.")
+            time.sleep(1.5)
             self.start_game()
 
     def new_game(self):
@@ -659,6 +676,11 @@ class MultiVerseTycoon:
                 print(f"{option_index}. Play mini games")
                 options.append("mini_games")
                 option_index += 1
+                
+            # Ad rewards (always available)
+            print(f"{option_index}. Ad rewards")
+            options.append("ad_rewards")
+            option_index += 1
             
             # Always available options
             print(f"{option_index}. Save game")
@@ -701,6 +723,8 @@ class MultiVerseTycoon:
                             self.purchase_special_items()
                         elif option == "mini_games":
                             self.play_mini_games()
+                        elif option == "ad_rewards":
+                            self.ad_rewards_menu()
                         elif option == "save":
                             self.save_game()
                         elif option == "quit":
@@ -1230,6 +1254,15 @@ class MultiVerseTycoon:
             employee_bonus += total_income * emp_type["efficiency_bonus"]
 
         total_income += employee_bonus
+        
+        # Apply ad reward multipliers if any are active
+        ad_reward_multiplier = self.apply_ad_reward_effects()
+        if ad_reward_multiplier > 1.0:
+            original_income = total_income
+            total_income *= ad_reward_multiplier
+            print(f"\n💰 Ad reward bonus applied! Income multiplier: x{ad_reward_multiplier}")
+            print(f"   Original income: {int(original_income)} {universe['currency']}")
+            print(f"   Boosted income: {int(total_income)} {universe['currency']}")
 
         # Apply income
         player_universe_data["cash"] += int(total_income)
@@ -2398,6 +2431,115 @@ class MultiVerseTycoon:
         self.player["mini_game_cooldown"] = 1
         
         input("\nPress Enter to continue...")
+    
+    def ad_rewards_menu(self):
+        """Display and handle the ad rewards menu."""
+        while True:
+            self.clear_screen()
+            
+            # Display a header
+            print("\n=== Ad Rewards System ===")
+            print("Boost your progress by watching ads or redeeming codes!")
+            
+            # Show active boosts
+            active_boosts = self.ad_rewards_system.get_active_boosts()
+            if active_boosts:
+                print("\n=== Active Boosts ===")
+                for boost in active_boosts:
+                    print(f"• {boost['name']} - {boost['turns_remaining']} turns remaining")
+            else:
+                print("\nNo active boosts at the moment.")
+                
+            # Show menu options
+            print("\nOptions:")
+            print("1. Watch an ad for a random reward")
+            print("2. Redeem a reward code")
+            print("3. About ad rewards")
+            print("4. Back to main menu")
+            
+            choice = input("\nSelect an option (1-4): ")
+            
+            if choice == "1":
+                self.watch_ad_for_reward()
+            elif choice == "2":
+                self.redeem_reward_code()
+            elif choice == "3":
+                self.display_ad_rewards_info()
+            elif choice == "4":
+                break
+            else:
+                print("\nInvalid choice. Please try again.")
+                input("\nPress Enter to continue...")
+    
+    def watch_ad_for_reward(self):
+        """Simulate watching an ad and receive a reward."""
+        self.clear_screen()
+        print("\n=== Watch Ad for Reward ===")
+        print("Watching an ad will get you a random reward.")
+        print("You can do this once every 12 hours in real time.")
+        
+        confirm = input("\nWould you like to watch an ad now? (y/n): ")
+        
+        if confirm.lower() == "y":
+            print("\nSimulating ad watching...")
+            for _ in range(5):
+                time.sleep(0.5)
+                print(".", end="", flush=True)
+            print()
+            
+            # Process the ad watch
+            success, message = self.ad_rewards_system.watch_ad_for_reward(self.player)
+            
+            if success:
+                print(f"\n✓ {message}")
+            else:
+                print(f"\n✗ {message}")
+        
+        input("\nPress Enter to continue...")
+    
+    def redeem_reward_code(self):
+        """Allow the player to enter and redeem a reward code."""
+        self.clear_screen()
+        print("\n=== Redeem Reward Code ===")
+        print("Enter a valid reward code to receive special bonuses.")
+        
+        code = input("\nEnter reward code (or type 'back' to return): ")
+        
+        if code.lower() == "back":
+            return
+            
+        # Process the code redemption
+        success, message = self.ad_rewards_system.redeem_code(self.player, code)
+        
+        if success:
+            print(f"\n✓ {message}")
+        else:
+            print(f"\n✗ {message}")
+        
+        input("\nPress Enter to continue...")
+    
+    def display_ad_rewards_info(self):
+        """Display information about possible ad rewards."""
+        self.clear_screen()
+        print("\n=== About Ad Rewards ===")
+        print("The ad rewards system allows you to earn special bonuses by:")
+        print("1. Watching ads (simulated in this version)")
+        print("2. Redeeming special codes you may receive")
+        
+        print("\nPossible rewards include:")
+        
+        # Display information about rewards
+        for reward_id, reward_data in self.ad_rewards_system.rewards.items():
+            print(f"\n• {reward_data['name']}")
+            print(f"  {reward_data['description']}")
+        
+        input("\nPress Enter to continue...")
+    
+    def apply_ad_reward_effects(self):
+        """Apply the effects of active ad rewards."""
+        # Get the multiplier for cash income
+        cash_multiplier = self.ad_rewards_system.update_turn(self.player)
+        return cash_multiplier
 
 
 if __name__ == "__main__":

@@ -24,6 +24,8 @@ INCLUDE_FILES = [
     "achievements.py",
     "heists.py", 
     "minigames.py",
+    "ad_rewards.py",
+    "admin_tools.py",  # Include for debugging
     "generated-icon.png",
     "README.md"
 ]

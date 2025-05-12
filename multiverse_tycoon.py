@@ -6,6 +6,7 @@ import time
 import os
 import sys
 from currency import CurrencyExchange, QuantumBusinesses, QuantumEvents
+from heists import HeistSystem
 
 class MultiVerseTycoon:
     def __init__(self):
@@ -21,7 +22,11 @@ class MultiVerseTycoon:
             "last_event_turn": 0,
             "quantum_credits": 0,  # Interdimensional currency
             "quantum_businesses": [],  # List of quantum businesses owned
-            "last_quantum_event_turn": 0
+            "last_quantum_event_turn": 0,
+            "heist_specialists": [],  # List of specialist crew members owned
+            "special_items": [],  # List of special items owned for heists
+            "heist_history": [],  # History of completed heists
+            "heist_cooldown": 0   # Turns until next heist is available
         }
         
         self.universes = {
@@ -238,6 +243,9 @@ class MultiVerseTycoon:
         self.QUANTUM_EVENT_PROBABILITY = 0.15  # 15% chance per turn
         self.QUANTUM_EVENT_COOLDOWN = 3        # At least 3 turns between events
         
+        # Initialize heist system
+        self.heist_system = HeistSystem(self.universes)
+        
     def clear_screen(self):
         """Clear the terminal screen."""
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -428,10 +436,13 @@ class MultiVerseTycoon:
             print("6. Currency exchange")
             print("7. Quantum business center")
             print("8. View exchange rates")
-            print("9. Save game")
-            print("10. Quit game")
+            print("9. Heist operations")
+            print("10. Recruit specialists")
+            print("11. Purchase special items")
+            print("12. Save game")
+            print("13. Quit game")
             
-            choice = input("\nChoose an action (1-10): ")
+            choice = input("\nChoose an action (1-13): ")
             
             if choice == "1":
                 self.start_business()
@@ -450,8 +461,14 @@ class MultiVerseTycoon:
             elif choice == "8":
                 self.view_exchange_rates()
             elif choice == "9":
-                self.save_game()
+                self.heist_operations()
             elif choice == "10":
+                self.recruit_specialists()
+            elif choice == "11":
+                self.purchase_special_items()
+            elif choice == "12":
+                self.save_game()
+            elif choice == "13":
                 confirm = input("\nAre you sure you want to quit? Progress will be lost unless saved. (y/n): ")
                 if confirm.lower() == "y":
                     print("\nThanks for playing Multiverse Tycoon!")
@@ -1262,6 +1279,442 @@ class MultiVerseTycoon:
             print(f"• Exchange fees have been temporarily reduced by {effect['exchange_fee_reduction']}%")
         
         input("\nPress Enter to continue...")
+
+    def heist_operations(self):
+        """Manage heist planning and execution."""
+        # Check if player is on heist cooldown
+        if self.player["heist_cooldown"] > 0:
+            self.clear_screen()
+            print("\n=== Heist Operations ===")
+            print(f"Your crew is laying low after the last heist. Cooldown: {self.player['heist_cooldown']} turns.")
+            input("\nPress Enter to continue...")
+            return
+            
+        universe_id = self.player["current_universe"]
+        universe = self.universes[universe_id]
+        player_universe_data = self.player["universes"][universe_id]
+        
+        self.clear_screen()
+        print("\n=== Interdimensional Heist Operations ===")
+        print(f"Current Universe: {universe['name']}")
+        print(f"Available Cash: {player_universe_data['cash']} {universe['currency']}")
+        print(f"Quantum Credits: {self.player['quantum_credits']} Q¢")
+        print(f"Danger Level: {player_universe_data['danger']}/100")
+        
+        # Display available heists in the current universe
+        available_heists = self.heist_system.get_available_heists(universe_id)
+        
+        if not available_heists:
+            print(f"\nNo heist opportunities available in the {universe['name']} universe.")
+            input("\nPress Enter to continue...")
+            return
+            
+        print("\n=== Available Heists ===")
+        for i, heist in enumerate(available_heists, 1):
+            print(f"{i}. {heist['name']}")
+            print(f"   Description: {heist['description']}")
+            print(f"   Base Reward: {heist['base_reward']} {universe['currency']} + {heist['quantum_reward']} Q¢")
+            print(f"   Required Skills: {', '.join(heist['required_skills'])}")
+            print(f"   Special Item: {heist['special_item']}")
+            print()
+            
+        print(f"{len(available_heists) + 1}. Back")
+        
+        try:
+            choice = int(input("\nSelect a heist to plan: "))
+            
+            if choice == len(available_heists) + 1:
+                return
+                
+            if 1 <= choice <= len(available_heists):
+                selected_heist = available_heists[choice - 1]
+                self.plan_heist(selected_heist)
+            else:
+                print("\nInvalid choice. Please try again.")
+                time.sleep(1.5)
+        except ValueError:
+            print("\nPlease enter a valid number.")
+            time.sleep(1.5)
+            
+    def plan_heist(self, heist):
+        """Plan the details of a heist."""
+        universe_id = self.player["current_universe"]
+        universe = self.universes[universe_id]
+        player_universe_data = self.player["universes"][universe_id]
+        
+        # Determine which difficulty levels are available
+        self.clear_screen()
+        print(f"\n=== Planning: {heist['name']} ===")
+        print(f"Description: {heist['description']}")
+        print(f"Required Skills: {', '.join(heist['required_skills'])}")
+        
+        # Check if player has any specialists with required skills
+        has_required_skills = False
+        for skill in heist['required_skills']:
+            for specialist_id in self.player["heist_specialists"]:
+                specialist = self.heist_system.specialists[specialist_id]
+                if skill in specialist["skills"]:
+                    has_required_skills = True
+                    break
+            if has_required_skills:
+                break
+                
+        # Check if player has the special item for this heist
+        has_special_item = False
+        special_item_id = heist['special_item']
+        if special_item_id in self.player["special_items"]:
+            has_special_item = True
+            special_item = self.heist_system.special_items[special_item_id]
+            
+        # Display difficulty options
+        print("\n=== Select Difficulty ===")
+        
+        difficulty_options = []
+        for diff_id, difficulty in self.heist_system.difficulty_levels.items():
+            # Check if player has enough crew members for this difficulty
+            has_enough_crew = len(self.player["heist_specialists"]) >= difficulty["min_crew"]
+            
+            # Calculate base success chance
+            base_success = int(difficulty["success_chance"] * 100)
+            
+            # Calculate potential success chance with player's specialists and items
+            potential_crew = self.player["heist_specialists"]
+            potential_items = self.player["special_items"]
+            potential_success = int(self.heist_system.get_heist_success_chance(heist, diff_id, potential_crew, potential_items) * 100)
+            
+            # Calculate rewards at this difficulty
+            reward_multiplier = difficulty["reward_multiplier"]
+            local_reward = int(heist["base_reward"] * reward_multiplier)
+            quantum_reward = int(heist["quantum_reward"] * reward_multiplier)
+            
+            # Add to available difficulties if player has enough crew
+            if has_enough_crew:
+                difficulty_options.append(diff_id)
+                print(f"{len(difficulty_options)}. {difficulty['name']}")
+                print(f"   Base Success Chance: {base_success}%")
+                print(f"   Your Success Chance: {potential_success}%")
+                print(f"   Reward: {local_reward} {universe['currency']} + {quantum_reward} Q¢")
+                print(f"   Danger Increase: {difficulty['danger_increase']}")
+                print(f"   Required Crew: {difficulty['min_crew']} specialists")
+                print(f"   Preparation Cost: {difficulty['min_preparation']} {universe['currency']}")
+                print()
+            
+        if not difficulty_options:
+            print("\nYou don't have enough crew members for any difficulty level.")
+            print("Consider recruiting more specialists first.")
+            input("\nPress Enter to continue...")
+            return
+            
+        print(f"{len(difficulty_options) + 1}. Back")
+        
+        try:
+            choice = int(input("\nSelect a difficulty level: "))
+            
+            if choice == len(difficulty_options) + 1:
+                return
+                
+            if 1 <= choice <= len(difficulty_options):
+                selected_difficulty = difficulty_options[choice - 1]
+                difficulty = self.heist_system.difficulty_levels[selected_difficulty]
+                
+                # Check if player has enough cash for preparation
+                if player_universe_data["cash"] < difficulty["min_preparation"]:
+                    print(f"\nYou don't have enough {universe['currency']} for the necessary preparations.")
+                    print(f"You need {difficulty['min_preparation']} {universe['currency']}.")
+                    input("\nPress Enter to continue...")
+                    return
+                    
+                # Confirm heist attempt
+                preparation_cost = difficulty["min_preparation"]
+                print(f"\nPreparing this heist will cost {preparation_cost} {universe['currency']}.")
+                confirm = input("Proceed with the heist? (y/n): ")
+                
+                if confirm.lower() == "y":
+                    # Deduct preparation cost
+                    player_universe_data["cash"] -= preparation_cost
+                    
+                    # Execute the heist
+                    self.execute_heist(heist, selected_difficulty)
+                
+            else:
+                print("\nInvalid choice. Please try again.")
+                time.sleep(1.5)
+        except ValueError:
+            print("\nPlease enter a valid number.")
+            time.sleep(1.5)
+            
+    def execute_heist(self, heist, difficulty_id):
+        """Execute a heist and determine the outcome."""
+        universe_id = self.player["current_universe"]
+        universe = self.universes[universe_id]
+        player_universe_data = self.player["universes"][universe_id]
+        
+        self.clear_screen()
+        print(f"\n=== Executing Heist: {heist['name']} ===")
+        
+        # Build suspense with typing effect
+        self.slow_print("Infiltrating target location...")
+        time.sleep(1)
+        self.slow_print("Bypassing security systems...")
+        time.sleep(1)
+        self.slow_print("Accessing the objective...")
+        time.sleep(1.5)
+        
+        # Execute the heist and get results
+        result = self.heist_system.execute_heist(heist, difficulty_id, self.player["heist_specialists"], self.player["special_items"])
+        
+        # Display outcome
+        print("\n=== Heist Result ===")
+        
+        if result["success"]:
+            print("\nSUCCESS! You completed the heist and escaped with the loot!")
+        else:
+            print("\nFAILURE! Something went wrong and you had to abort the heist.")
+            
+        print(f"Success Chance: {int(result['success_chance'] * 100)}%")
+        print(f"Roll: {int(result['roll'] * 100)}%")
+        
+        # Apply rewards if successful
+        if result["success"]:
+            # Calculate crew payment
+            print("\n=== Rewards ===")
+            print(f"Total Haul: {result['gross_reward']['local_currency']} {universe['currency']} + {result['gross_reward']['quantum_credits']} Q¢")
+            print(f"Crew Payment: {result['crew_payment']['local_currency']} {universe['currency']} + {result['crew_payment']['quantum_credits']} Q¢ ({result['crew_payment']['percentage']}%)")
+            print(f"Your Share: {result['net_reward']['local_currency']} {universe['currency']} + {result['net_reward']['quantum_credits']} Q¢")
+            
+            # Add rewards to player
+            player_universe_data["cash"] += result["net_reward"]["local_currency"]
+            self.player["quantum_credits"] += result["net_reward"]["quantum_credits"]
+            
+            # Increase danger level
+            danger_increase = result["danger_increase"]
+            player_universe_data["danger"] += danger_increase
+            print(f"\nDanger level increased by {danger_increase}!")
+            
+            # Check if danger level exceeds threshold
+            if player_universe_data["danger"] >= self.DANGER_THRESHOLD:
+                self.player["game_over"] = True
+                self.player["end_reason"] = f"Your heist operation in {universe['name']} was discovered by authorities!"
+                
+            # Add to heist history
+            self.player["heist_history"].append({
+                "name": heist["name"],
+                "universe": universe["name"],
+                "difficulty": self.heist_system.difficulty_levels[difficulty_id]["name"],
+                "success": True,
+                "reward_local": result["net_reward"]["local_currency"],
+                "reward_quantum": result["net_reward"]["quantum_credits"],
+                "turn": self.player["turn"]
+            })
+            
+            # Set cooldown
+            self.player["heist_cooldown"] = 3  # 3 turns until next heist
+        else:
+            print("\nSince the heist failed, you didn't earn any rewards.")
+            print("However, your escape was clean and didn't raise suspicion.")
+            
+            # Add to heist history
+            self.player["heist_history"].append({
+                "name": heist["name"],
+                "universe": universe["name"],
+                "difficulty": self.heist_system.difficulty_levels[difficulty_id]["name"],
+                "success": False,
+                "reward_local": 0,
+                "reward_quantum": 0,
+                "turn": self.player["turn"]
+            })
+            
+            # Set cooldown
+            self.player["heist_cooldown"] = 2  # 2 turns until next heist
+            
+        input("\nPress Enter to continue...")
+        
+    def recruit_specialists(self):
+        """Recruit specialists for heist operations."""
+        universe_id = self.player["current_universe"]
+        universe = self.universes[universe_id]
+        player_universe_data = self.player["universes"][universe_id]
+        
+        self.clear_screen()
+        print("\n=== Recruit Heist Specialists ===")
+        print(f"Available Cash: {player_universe_data['cash']} {universe['currency']}")
+        print(f"Quantum Credits: {self.player['quantum_credits']} Q¢")
+        
+        # Show currently owned specialists
+        if self.player["heist_specialists"]:
+            print("\n=== Your Specialist Crew ===")
+            for specialist_id in self.player["heist_specialists"]:
+                specialist = self.heist_system.specialists[specialist_id]
+                print(f"- {specialist['name']}")
+                print(f"  Skills: {', '.join(specialist['skills'])}")
+                print(f"  Payment: {specialist['payment_percentage']}% of heist rewards")
+                print()
+        
+        # Get available specialists for recruitment
+        available_specialists = self.heist_system.get_available_specialists(self.player["heist_specialists"])
+        
+        if not available_specialists:
+            print("\nThere are no more specialists available for recruitment.")
+            input("\nPress Enter to continue...")
+            return
+            
+        print("\n=== Available Specialists ===")
+        specialists_list = list(available_specialists.items())
+        
+        for i, (specialist_id, specialist) in enumerate(specialists_list, 1):
+            print(f"{i}. {specialist['name']}")
+            print(f"   Skills: {', '.join(specialist['skills'])}")
+            print(f"   Hiring Cost: {specialist['hiring_cost']} {universe['currency']}")
+            print(f"   Payment: {specialist['payment_percentage']}% of heist rewards")
+            print(f"   Success Bonus: +{int(specialist['success_bonus'] * 100)}% for heists using their skills")
+            print()
+            
+        print(f"{len(specialists_list) + 1}. Back")
+        
+        try:
+            choice = int(input("\nWhich specialist would you like to recruit? "))
+            
+            if choice == len(specialists_list) + 1:
+                return
+                
+            if 1 <= choice <= len(specialists_list):
+                specialist_id, specialist = specialists_list[choice - 1]
+                
+                # Check if player has enough cash
+                if player_universe_data["cash"] < specialist["hiring_cost"]:
+                    print(f"\nYou don't have enough {universe['currency']} to hire this specialist.")
+                    time.sleep(1.5)
+                    return
+                    
+                # Confirm recruitment
+                confirm = input(f"\nHire {specialist['name']} for {specialist['hiring_cost']} {universe['currency']}? (y/n): ")
+                
+                if confirm.lower() == "y":
+                    # Deduct cost and add specialist to crew
+                    player_universe_data["cash"] -= specialist["hiring_cost"]
+                    self.player["heist_specialists"].append(specialist_id)
+                    
+                    print(f"\n{specialist['name']} has joined your crew!")
+                    print(f"They will help with heists requiring {', '.join(specialist['skills'])} skills.")
+            else:
+                print("\nInvalid choice. Please try again.")
+                time.sleep(1.5)
+        except ValueError:
+            print("\nPlease enter a valid number.")
+            time.sleep(1.5)
+            
+        input("\nPress Enter to continue...")
+        
+    def purchase_special_items(self):
+        """Purchase special items for heist operations."""
+        universe_id = self.player["current_universe"]
+        universe = self.universes[universe_id]
+        player_universe_data = self.player["universes"][universe_id]
+        
+        self.clear_screen()
+        print("\n=== Purchase Special Items ===")
+        print(f"Available Cash: {player_universe_data['cash']} {universe['currency']}")
+        print(f"Quantum Credits: {self.player['quantum_credits']} Q¢")
+        
+        # Show currently owned items
+        if self.player["special_items"]:
+            print("\n=== Your Special Items ===")
+            for item_id in self.player["special_items"]:
+                item = self.heist_system.special_items[item_id]
+                print(f"- {item['name']}")
+                print(f"  Description: {item['description']}")
+                print(f"  Success Bonus: +{int(item['success_bonus'] * 100)}% for applicable heists")
+                print(f"  Applicable Heists: {', '.join(item['applicable_heists'])}")
+                print()
+        
+        # Get available items for purchase
+        available_items = self.heist_system.get_available_special_items(self.player["special_items"])
+        
+        if not available_items:
+            print("\nThere are no more special items available for purchase.")
+            input("\nPress Enter to continue...")
+            return
+            
+        print("\n=== Available Special Items ===")
+        items_list = list(available_items.items())
+        
+        for i, (item_id, item) in enumerate(items_list, 1):
+            print(f"{i}. {item['name']}")
+            print(f"   Description: {item['description']}")
+            print(f"   Cost: {item['cost']} {universe['currency']}")
+            print(f"   Success Bonus: +{int(item['success_bonus'] * 100)}% for applicable heists")
+            print(f"   Applicable Heists: {', '.join(item['applicable_heists'])}")
+            print()
+            
+        print(f"{len(items_list) + 1}. Back")
+        
+        try:
+            choice = int(input("\nWhich item would you like to purchase? "))
+            
+            if choice == len(items_list) + 1:
+                return
+                
+            if 1 <= choice <= len(items_list):
+                item_id, item = items_list[choice - 1]
+                
+                # Check if player has enough cash
+                if player_universe_data["cash"] < item["cost"]:
+                    print(f"\nYou don't have enough {universe['currency']} to purchase this item.")
+                    time.sleep(1.5)
+                    return
+                    
+                # Confirm purchase
+                confirm = input(f"\nPurchase {item['name']} for {item['cost']} {universe['currency']}? (y/n): ")
+                
+                if confirm.lower() == "y":
+                    # Deduct cost and add item to inventory
+                    player_universe_data["cash"] -= item["cost"]
+                    self.player["special_items"].append(item_id)
+                    
+                    print(f"\nYou have acquired the {item['name']}!")
+                    print(f"This will be useful for the following heists: {', '.join(item['applicable_heists'])}")
+            else:
+                print("\nInvalid choice. Please try again.")
+                time.sleep(1.5)
+        except ValueError:
+            print("\nPlease enter a valid number.")
+            time.sleep(1.5)
+            
+        input("\nPress Enter to continue...")
+        
+    def advance_turn(self):
+        """Advance the game by one turn."""
+        universe_id = self.player["current_universe"]
+        universe = self.universes[universe_id]
+        player_universe_data = self.player["universes"][universe_id]
+        
+        # Calculate and apply business income
+        income = self.calculate_business_income()
+        
+        # Calculate income from quantum businesses
+        self.calculate_quantum_business_income()
+        
+        # Pay employee salaries
+        salaries = self.pay_employee_salaries()
+        
+        # Apply danger reductions from employees
+        danger_reduction = self.apply_danger_reductions()
+        
+        # Trigger a random event with probability
+        self.maybe_trigger_random_event()
+        
+        # Check for quantum events
+        self.check_for_quantum_events()
+        
+        # Reduce heist cooldown if active
+        if self.player["heist_cooldown"] > 0:
+            self.player["heist_cooldown"] -= 1
+            if self.player["heist_cooldown"] == 0:
+                print("\nYour crew is ready for another heist!")
+        
+        # Display turn summary
+        self.clear_screen()
+        print("\n=== Turn Summary ===")
 
 
 if __name__ == "__main__":

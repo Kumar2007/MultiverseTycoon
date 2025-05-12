@@ -300,7 +300,7 @@ class MiniGameSystem:
             elapsed_time = time.time() - start_time
             if elapsed_time > time_per_word:
                 print(f"Time's up! The word was: {word}")
-                time.sleep(2)
+                time.sleep(1.0)  # Reduced delay for faster gameplay
                 continue
                 
             # Check guess
@@ -312,7 +312,7 @@ class MiniGameSystem:
             else:
                 print(f"Wrong! The word was: {word}")
                 
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             
         # Calculate success rate
         success_rate = correct_count / num_words
@@ -392,7 +392,7 @@ class MiniGameSystem:
                 print(f"Too slow! Your reaction time: {reaction_time:.3f} seconds")
                 print(f"Needed to be under {error_margin} seconds")
                 
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             
         # Calculate success rate
         success_rate = successful_rounds / num_rounds
@@ -454,7 +454,7 @@ class MiniGameSystem:
             self.clear_screen()
             print(f"\nMemorize this sequence ({current_length} symbols):")
             print("It will disappear soon...")
-            time.sleep(1)
+            time.sleep(0.5)  # Reduced delay for faster gameplay
             
             print("\n" + " ".join(sequence))
             time.sleep(current_length * view_time)
@@ -474,7 +474,7 @@ class MiniGameSystem:
             if correct:
                 print("\nCorrect! Well done!")
                 current_length += 1
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
             else:
                 print("\nIncorrect! Game over.")
                 print(f"The correct sequence was: {' '.join(sequence)}")

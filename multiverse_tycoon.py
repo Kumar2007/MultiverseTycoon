@@ -381,8 +381,9 @@ class MultiVerseTycoon:
         """Clear the terminal screen."""
         os.system('cls' if os.name == 'nt' else 'clear')
 
-    def slow_print(self, text, delay=0.03):
-        """Print text with a typing effect."""
+    def slow_print(self, text, delay=0.01):
+        """Print text with a typing effect, but faster."""
+        # Reduced delay from 0.03 to 0.01 for faster typing effect
         for char in text:
             sys.stdout.write(char)
             sys.stdout.flush()
@@ -391,22 +392,31 @@ class MultiVerseTycoon:
 
     def display_title(self):
         """Display the game title."""
-        title = """
-        ███╗   ███╗██╗   ██╗██╗  ████████╗██╗██╗   ██╗███████╗██████╗ ███████╗███████╗
-        ████╗ ████║██║   ██║██║  ╚══██╔══╝██║██║   ██║██╔════╝██╔══██╗██╔════╝██╔════╝
-        ██╔████╔██║██║   ██║██║     ██║   ██║██║   ██║█████╗  ██████╔╝███████╗█████╗  
-        ██║╚██╔╝██║██║   ██║██║     ██║   ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗╚════██║██╔══╝  
-        ██║ ╚═╝ ██║╚██████╔╝███████╗██║   ██║ ╚████╔╝ ███████╗██║  ██║███████║███████╗
-        ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝
-                                                                                      
-        ████████╗██╗   ██╗ ██████╗ ██████╗  ██████╗ ███╗   ██╗                         
-        ╚══██╔══╝╚██╗ ██╔╝██╔════╝██╔═══██╗██╔═══██╗████╗  ██║                         
-           ██║    ╚████╔╝ ██║     ██║   ██║██║   ██║██╔██╗ ██║                         
-           ██║     ╚██╔╝  ██║     ██║   ██║██║   ██║██║╚██╗██║                         
-           ██║      ██║   ╚██████╗╚██████╔╝╚██████╔╝██║ ╚████║                         
-           ╚═╝      ╚═╝    ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝                         
-        """
-        print(title)
+        # Center each line of the title in the terminal
+        title_lines = [
+            "███╗   ███╗██╗   ██╗██╗  ████████╗██╗██╗   ██╗███████╗██████╗ ███████╗███████╗",
+            "████╗ ████║██║   ██║██║  ╚══██╔══╝██║██║   ██║██╔════╝██╔══██╗██╔════╝██╔════╝",
+            "██╔████╔██║██║   ██║██║     ██║   ██║██║   ██║█████╗  ██████╔╝███████╗█████╗  ",
+            "██║╚██╔╝██║██║   ██║██║     ██║   ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗╚════██║██╔══╝  ",
+            "██║ ╚═╝ ██║╚██████╔╝███████╗██║   ██║ ╚████╔╝ ███████╗██║  ██║███████║███████╗",
+            "╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝",
+            "",
+            "████████╗██╗   ██╗ ██████╗ ██████╗  ██████╗ ███╗   ██╗",
+            "╚══██╔══╝╚██╗ ██╔╝██╔════╝██╔═══██╗██╔═══██╗████╗  ██║",
+            "   ██║    ╚████╔╝ ██║     ██║   ██║██║   ██║██╔██╗ ██║",
+            "   ██║     ╚██╔╝  ██║     ██║   ██║██║   ██║██║╚██╗██║",
+            "   ██║      ██║   ╚██████╗╚██████╔╝╚██████╔╝██║ ╚████║",
+            "   ╚═╝      ╚═╝    ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝"
+        ]
+        
+        # Get terminal width
+        terminal_width = os.get_terminal_size().columns
+        
+        # Print each line centered
+        print("")  # Add a blank line before the title
+        for line in title_lines:
+            print(line.center(terminal_width))
+        
         print("\n" + "=" * 80)
         print("\tManage businesses across multiple universes!")
         print("\tBuild your multiverse empire and avoid detection.")
@@ -432,7 +442,7 @@ class MultiVerseTycoon:
             sys.exit()
         else:
             print("\nInvalid choice. Please try again.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             self.start_game()
 
     def new_game(self):
@@ -494,7 +504,7 @@ class MultiVerseTycoon:
 
         if not save_files:
             print("\nNo saved games found!")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             self.start_game()
             return
 
@@ -516,15 +526,15 @@ class MultiVerseTycoon:
                 with open(filename, "r") as file:
                     self.player = json.load(file)
                 print(f"\nWelcome back, {self.player['name']}!")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
                 self.main_game_loop()
             else:
                 print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
                 self.load_game()
         except Exception as e:
             print(f"\nError loading game: {e}")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             self.load_game()
 
     def display_universe_info(self):
@@ -676,10 +686,10 @@ class MultiVerseTycoon:
                                 sys.exit()
                     else:
                         print("\nInvalid choice. Please try again.")
-                        time.sleep(1.5)
+                        time.sleep(0.75)  # Reduced delay for faster gameplay
                 except ValueError:
                     print("\nInvalid choice. Please enter a number.")
-                    time.sleep(1.5)
+                    time.sleep(0.75)  # Reduced delay for faster gameplay
 
             # Only advance the turn if the player didn't save/quit
             should_advance = True
@@ -773,11 +783,11 @@ class MultiVerseTycoon:
                 input("\nPress Enter to continue...")
             else:
                 print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
                 self.start_business()
         except ValueError:
             print("\nPlease enter a valid number.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             self.start_business()
 
     def hire_employee(self):
@@ -841,11 +851,11 @@ class MultiVerseTycoon:
                 input("\nPress Enter to continue...")
             else:
                 print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
                 self.hire_employee()
         except ValueError:
             print("\nPlease enter a valid number.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             self.hire_employee()
 
     def fire_employee(self):
@@ -927,11 +937,11 @@ class MultiVerseTycoon:
                 input("\nPress Enter to continue...")
             else:
                 print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
                 self.fire_employee()
         except ValueError:
             print("\nPlease enter a valid number.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             self.fire_employee()
 
     def bribe_officials(self):
@@ -1009,7 +1019,7 @@ class MultiVerseTycoon:
             return
         else:
             print("\nInvalid choice. Please try again.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             self.bribe_officials()
             return
 
@@ -1075,11 +1085,11 @@ class MultiVerseTycoon:
                 input("\nPress Enter to continue...")
             else:
                 print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
                 self.jump_universe()
         except ValueError:
             print("\nPlease enter a valid number.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             self.jump_universe()
 
     def maybe_trigger_random_event(self):
@@ -1405,12 +1415,12 @@ class MultiVerseTycoon:
 
                 if amount <= 0:
                     print("\nPlease enter a positive amount.")
-                    time.sleep(1.5)
+                    time.sleep(0.75)  # Reduced delay for faster gameplay
                     return
 
                 if amount > player_universe_data["cash"]:
                     print(f"\nYou don't have enough {universe['currency']}.")
-                    time.sleep(1.5)
+                    time.sleep(0.75)  # Reduced delay for faster gameplay
                     return
 
                 quantum_amount = self.currency_exchange.local_to_quantum(
@@ -1433,7 +1443,7 @@ class MultiVerseTycoon:
             except ValueError:
                 print("\nPlease enter a valid number.")
 
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
 
         elif choice == "2":
             # Quantum to Local
@@ -1445,12 +1455,12 @@ class MultiVerseTycoon:
 
                 if amount <= 0:
                     print("\nPlease enter a positive amount.")
-                    time.sleep(1.5)
+                    time.sleep(0.75)  # Reduced delay for faster gameplay
                     return
 
                 if amount > self.player["quantum_credits"]:
                     print("\nYou don't have enough Quantum Credits.")
-                    time.sleep(1.5)
+                    time.sleep(0.75)  # Reduced delay for faster gameplay
                     return
 
                 local_amount = self.currency_exchange.quantum_to_local(
@@ -1473,7 +1483,7 @@ class MultiVerseTycoon:
             except ValueError:
                 print("\nPlease enter a valid number.")
 
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
 
     def view_exchange_rates(self):
         """View the exchange rates for all universes."""
@@ -1541,7 +1551,7 @@ class MultiVerseTycoon:
                     if self.player["quantum_credits"] < business["cost"][
                             "quantum_credits"]:
                         print("\nYou don't have enough Quantum Credits!")
-                        time.sleep(1.5)
+                        time.sleep(0.75)  # Reduced delay for faster gameplay
                         return
 
                     # Purchase the business
@@ -1725,10 +1735,10 @@ class MultiVerseTycoon:
                 self.plan_heist(selected_heist)
             else:
                 print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
         except ValueError:
             print("\nPlease enter a valid number.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
 
     def plan_heist(self, heist):
         """Plan the details of a heist."""
@@ -1850,10 +1860,10 @@ class MultiVerseTycoon:
 
             else:
                 print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
         except ValueError:
             print("\nPlease enter a valid number.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
 
     def execute_heist(self, heist, difficulty_id):
         """Execute a heist and determine the outcome."""
@@ -1870,7 +1880,7 @@ class MultiVerseTycoon:
         self.slow_print("Bypassing security systems...")
         time.sleep(1)
         self.slow_print("Accessing the objective...")
-        time.sleep(1.5)
+        time.sleep(0.75)  # Reduced delay for faster gameplay
 
         # Execute the heist and get results
         result = self.heist_system.execute_heist(
@@ -2044,7 +2054,7 @@ class MultiVerseTycoon:
                     print(
                         f"\nYou don't have enough {universe['currency']} to hire this specialist."
                     )
-                    time.sleep(1.5)
+                    time.sleep(0.75)  # Reduced delay for faster gameplay
                     return
 
                 # Confirm recruitment
@@ -2063,10 +2073,10 @@ class MultiVerseTycoon:
                     )
             else:
                 print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
         except ValueError:
             print("\nPlease enter a valid number.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
 
         input("\nPress Enter to continue...")
 
@@ -2144,7 +2154,7 @@ class MultiVerseTycoon:
                     print(
                         f"\nYou don't have enough {universe['currency']} to purchase this item."
                     )
-                    time.sleep(1.5)
+                    time.sleep(0.75)  # Reduced delay for faster gameplay
                     return
 
                 # Confirm purchase
@@ -2163,10 +2173,10 @@ class MultiVerseTycoon:
                     )
             else:
                 print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
         except ValueError:
             print("\nPlease enter a valid number.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
 
         input("\nPress Enter to continue...")
 
@@ -2266,10 +2276,10 @@ class MultiVerseTycoon:
                 self.select_mini_game_difficulty(game_id, game)
             else:
                 print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
         except ValueError:
             print("\nPlease enter a valid number.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             
     def select_mini_game_difficulty(self, game_id, game):
         """Select the difficulty level for a mini game."""
@@ -2304,10 +2314,10 @@ class MultiVerseTycoon:
                 self.play_selected_mini_game(game_id, selected_difficulty)
             else:
                 print("\nInvalid choice. Please try again.")
-                time.sleep(1.5)
+                time.sleep(0.75)  # Reduced delay for faster gameplay
         except ValueError:
             print("\nPlease enter a valid number.")
-            time.sleep(1.5)
+            time.sleep(0.75)  # Reduced delay for faster gameplay
             
     def play_selected_mini_game(self, game_id, difficulty):
         """Play the selected mini game at the chosen difficulty."""

@@ -5,6 +5,7 @@ import random
 import time
 import os
 import sys
+from currency import CurrencyExchange, QuantumBusinesses, QuantumEvents
 
 class MultiVerseTycoon:
     def __init__(self):
@@ -17,7 +18,10 @@ class MultiVerseTycoon:
             "game_over": False,
             "end_reason": "",
             "event_history": {},
-            "last_event_turn": 0
+            "last_event_turn": 0,
+            "quantum_credits": 0,  # Interdimensional currency
+            "quantum_businesses": [],  # List of quantum businesses owned
+            "last_quantum_event_turn": 0
         }
         
         self.universes = {
@@ -221,6 +225,19 @@ class MultiVerseTycoon:
         self.DANGER_THRESHOLD = 100
         self.starting_cash = 10000
         
+        # Initialize currency exchange system
+        self.currency_exchange = CurrencyExchange(self.universes)
+        
+        # Initialize quantum business system
+        self.quantum_businesses = QuantumBusinesses()
+        
+        # Initialize quantum events
+        self.quantum_events = QuantumEvents()
+        
+        # Constants for quantum events
+        self.QUANTUM_EVENT_PROBABILITY = 0.15  # 15% chance per turn
+        self.QUANTUM_EVENT_COOLDOWN = 3        # At least 3 turns between events
+        
     def clear_screen(self):
         """Clear the terminal screen."""
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -373,6 +390,7 @@ class MultiVerseTycoon:
         
         print("\n=== Your Status ===")
         print(f"Cash: {player_universe_data['cash']} {universe['currency']}")
+        print(f"Quantum Credits: {self.player['quantum_credits']} Q¢") 
         print(f"Danger Level: {player_universe_data['danger']}/100")
         print(f"Reputation: {player_universe_data['reputation']}")
         
@@ -407,10 +425,13 @@ class MultiVerseTycoon:
             print("3. Fire employees")
             print("4. Bribe officials (Reduce danger level)")
             print("5. Jump to another universe")
-            print("6. Save game")
-            print("7. Quit game")
+            print("6. Currency exchange")
+            print("7. Quantum business center")
+            print("8. View exchange rates")
+            print("9. Save game")
+            print("10. Quit game")
             
-            choice = input("\nChoose an action (1-7): ")
+            choice = input("\nChoose an action (1-10): ")
             
             if choice == "1":
                 self.start_business()
@@ -423,8 +444,14 @@ class MultiVerseTycoon:
             elif choice == "5":
                 self.jump_universe()
             elif choice == "6":
-                self.save_game()
+                self.currency_exchange_menu()
             elif choice == "7":
+                self.quantum_business_center()
+            elif choice == "8":
+                self.view_exchange_rates()
+            elif choice == "9":
+                self.save_game()
+            elif choice == "10":
                 confirm = input("\nAre you sure you want to quit? Progress will be lost unless saved. (y/n): ")
                 if confirm.lower() == "y":
                     print("\nThanks for playing Multiverse Tycoon!")
@@ -912,6 +939,9 @@ class MultiVerseTycoon:
         # Calculate and apply business income
         income = self.calculate_business_income()
         
+        # Calculate income from quantum businesses
+        self.calculate_quantum_business_income()
+        
         # Pay employee salaries
         salaries = self.pay_employee_salaries()
         
@@ -920,6 +950,9 @@ class MultiVerseTycoon:
         
         # Trigger a random event with probability
         self.maybe_trigger_random_event()
+        
+        # Check for quantum events
+        self.check_for_quantum_events()
         
         # Display turn summary
         self.clear_screen()
@@ -970,8 +1003,17 @@ class MultiVerseTycoon:
             total_businesses += len(universe_data['businesses'])
             max_danger = max(max_danger, universe_data['danger'])
             
-        print(f"\nTotal Wealth Across Multiverse: {total_wealth}")
-        print(f"Total Businesses: {total_businesses}")
+        # Display quantum/interdimensional stats
+        print(f"\nInterdimensional Empire:")
+        print(f"• Quantum Credits: {self.player['quantum_credits']} Q¢")
+        print(f"• Quantum Businesses: {len(self.player['quantum_businesses'])}")
+        
+        # Calculate total wealth in quantum credits for comparison
+        total_quantum_wealth = self.currency_exchange.calculate_total_quantum_wealth(self.player)
+        
+        print(f"\nTotal Wealth Across Multiverse: {total_wealth} (combined currencies)")
+        print(f"Total Wealth in Quantum Credits: {total_quantum_wealth} Q¢")
+        print(f"Total Businesses: {total_businesses + len(self.player['quantum_businesses'])}")
         print(f"Maximum Danger Level: {max_danger}/100")
         
         # Ask if the player wants to play again
@@ -988,7 +1030,240 @@ class MultiVerseTycoon:
             print("\nThanks for playing Multiverse Tycoon!")
             sys.exit()
 
-# Start the game if run directly
+    def currency_exchange_menu(self):
+        """Display the currency exchange menu and handle transactions."""
+        universe_id = self.player["current_universe"]
+        universe = self.universes[universe_id]
+        player_universe_data = self.player["universes"][universe_id]
+        
+        self.clear_screen()
+        print("\n=== Quantum Credit Exchange ===")
+        print(f"Local Currency: {player_universe_data['cash']} {universe['currency']}")
+        print(f"Quantum Credits: {self.player['quantum_credits']} Q¢")
+        print(f"Exchange Rate: {self.currency_exchange.get_exchange_rate(universe_id)} {universe['currency']} = 1 Q¢")
+        print(f"Exchange Fee: {self.currency_exchange.exchange_fee}%")
+        
+        print("\n1. Exchange local currency for Quantum Credits")
+        print("2. Exchange Quantum Credits for local currency")
+        print("3. Back")
+        
+        choice = input("\nWhat would you like to do? ")
+        
+        if choice == "1":
+            # Local to Quantum
+            try:
+                amount = int(input(f"\nHow much {universe['currency']} would you like to exchange? "))
+                
+                if amount <= 0:
+                    print("\nPlease enter a positive amount.")
+                    time.sleep(1.5)
+                    return
+                    
+                if amount > player_universe_data["cash"]:
+                    print(f"\nYou don't have enough {universe['currency']}.")
+                    time.sleep(1.5)
+                    return
+                    
+                quantum_amount = self.currency_exchange.local_to_quantum(amount, universe_id)
+                
+                print(f"\nYou will receive {quantum_amount} Q¢ for {amount} {universe['currency']}.")
+                confirm = input("Proceed with the exchange? (y/n): ")
+                
+                if confirm.lower() == "y":
+                    # Deduct local currency
+                    player_universe_data["cash"] -= amount
+                    # Add quantum credits
+                    self.player["quantum_credits"] += quantum_amount
+                    
+                    print(f"\nExchange complete! You now have {self.player['quantum_credits']} Q¢.")
+            except ValueError:
+                print("\nPlease enter a valid number.")
+                
+            time.sleep(1.5)
+            
+        elif choice == "2":
+            # Quantum to Local
+            try:
+                amount = float(input("\nHow many Quantum Credits would you like to exchange? "))
+                
+                if amount <= 0:
+                    print("\nPlease enter a positive amount.")
+                    time.sleep(1.5)
+                    return
+                    
+                if amount > self.player["quantum_credits"]:
+                    print("\nYou don't have enough Quantum Credits.")
+                    time.sleep(1.5)
+                    return
+                    
+                local_amount = self.currency_exchange.quantum_to_local(amount, universe_id)
+                
+                print(f"\nYou will receive {local_amount} {universe['currency']} for {amount} Q¢.")
+                confirm = input("Proceed with the exchange? (y/n): ")
+                
+                if confirm.lower() == "y":
+                    # Deduct quantum credits
+                    self.player["quantum_credits"] -= amount
+                    # Add local currency
+                    player_universe_data["cash"] += local_amount
+                    
+                    print(f"\nExchange complete! You now have {player_universe_data['cash']} {universe['currency']}.")
+            except ValueError:
+                print("\nPlease enter a valid number.")
+                
+            time.sleep(1.5)
+    
+    def view_exchange_rates(self):
+        """View the exchange rates for all universes."""
+        self.clear_screen()
+        print(self.currency_exchange.display_exchange_rates())
+        input("\nPress Enter to continue...")
+    
+    def quantum_business_center(self):
+        """Manage quantum businesses that operate across universes."""
+        self.clear_screen()
+        print("\n=== Quantum Business Center ===")
+        print("These special businesses operate across all universes using Quantum Credits.")
+        print(f"Available Quantum Credits: {self.player['quantum_credits']} Q¢")
+        
+        # Display owned quantum businesses
+        if self.player["quantum_businesses"]:
+            print("\n=== Your Quantum Businesses ===")
+            for business_id in self.player["quantum_businesses"]:
+                business = self.quantum_businesses.quantum_businesses[business_id]
+                print(f"- {business['name']} (Income: {business['income_per_turn']} Q¢/turn)")
+                print(f"  Description: {business['description']}")
+        
+        # Display available quantum businesses
+        available_businesses = self.quantum_businesses.get_available_businesses(self.player, self.currency_exchange)
+        
+        if available_businesses:
+            print("\n=== Available Quantum Businesses ===")
+            for i, (business_id, business) in enumerate(available_businesses.items(), 1):
+                print(f"{i}. {business['name']} (Cost: {business['cost']['quantum_credits']} Q¢)")
+                print(f"   Income: {business['income_per_turn']} Q¢/turn")
+                print(f"   Description: {business['description']}")
+                print(f"   Risk Increase: {business['risk_increase']}")
+                print()
+                
+            print(f"{len(available_businesses) + 1}. Back")
+            
+            try:
+                choice = int(input("\nWhich business would you like to start? "))
+                
+                if choice == len(available_businesses) + 1:
+                    return
+                    
+                if 1 <= choice <= len(available_businesses):
+                    business_id = list(available_businesses.keys())[choice - 1]
+                    business = available_businesses[business_id]
+                    
+                    # Check if player has enough quantum credits
+                    if self.player["quantum_credits"] < business["cost"]["quantum_credits"]:
+                        print("\nYou don't have enough Quantum Credits!")
+                        time.sleep(1.5)
+                        return
+                    
+                    # Purchase the business
+                    self.player["quantum_credits"] -= business["cost"]["quantum_credits"]
+                    self.player["quantum_businesses"].append(business_id)
+                    
+                    print(f"\nCongratulations! You now own a {business['name']}!")
+                    print(f"It will generate {business['income_per_turn']} Q¢ per turn.")
+                    
+                    # Update current universe's danger level
+                    universe_id = self.player["current_universe"]
+                    player_universe_data = self.player["universes"][universe_id]
+                    player_universe_data["danger"] += business["risk_increase"]
+                    
+                    # Check if danger level exceeds threshold
+                    if player_universe_data["danger"] >= self.DANGER_THRESHOLD:
+                        self.player["game_over"] = True
+                        self.player["end_reason"] = f"Your operation in the {self.universes[universe_id]['name']} universe was discovered!"
+                else:
+                    print("\nInvalid choice. Please try again.")
+            except ValueError:
+                print("\nPlease enter a valid number.")
+        else:
+            print("\nNo quantum businesses available yet.")
+            print("You may need to build more regular businesses or increase your reputation.")
+            
+        input("\nPress Enter to continue...")
+        
+    def calculate_quantum_business_income(self):
+        """Calculate and apply income from quantum businesses."""
+        if not self.player["quantum_businesses"]:
+            return
+            
+        total_income = 0
+        
+        for business_id in self.player["quantum_businesses"]:
+            business = self.quantum_businesses.quantum_businesses[business_id]
+            total_income += business["income_per_turn"]
+            
+        self.player["quantum_credits"] += total_income
+        print(f"\nYour quantum businesses generated {total_income} Q¢ this turn!")
+    
+    def check_for_quantum_events(self):
+        """Check if a quantum event should occur this turn."""
+        current_turn = self.player["turn"]
+        
+        # Check if enough turns have passed since last quantum event
+        turns_since_last_event = current_turn - self.player.get("last_quantum_event_turn", 0)
+        if turns_since_last_event < self.QUANTUM_EVENT_COOLDOWN:
+            return
+            
+        # Roll the dice - if random value is less than probability, trigger event
+        if random.random() < self.QUANTUM_EVENT_PROBABILITY:
+            self.trigger_quantum_event()
+            self.player["last_quantum_event_turn"] = current_turn
+    
+    def trigger_quantum_event(self):
+        """Trigger a random quantum event that affects interdimensional operations."""
+        event = self.quantum_events.get_random_event()
+        
+        if not event:
+            return
+            
+        universe_id = self.player["current_universe"]
+        universe = self.universes[universe_id]
+        
+        self.clear_screen()
+        print("\n=== QUANTUM ANOMALY DETECTED ===")
+        self.slow_print(f"Event: {event['name']}")
+        self.slow_print(f"Description: {event['description']}")
+        
+        # Apply the event effects
+        effect = event["effect"]
+        
+        if "quantum_credits" in effect:
+            self.player["quantum_credits"] += effect["quantum_credits"]
+            self.player["quantum_credits"] = max(0, self.player["quantum_credits"])  # Ensure not negative
+            
+        if "exchange_rate_modifier" in effect:
+            # This would modify exchange rates temporarily - simplified implementation
+            pass
+            
+        if "exchange_fee_reduction" in effect:
+            # This would reduce exchange fees temporarily - simplified implementation
+            pass
+            
+        print("\nEffect:")
+        if "quantum_credits" in effect:
+            if effect["quantum_credits"] > 0:
+                print(f"• Quantum Credits: +{effect['quantum_credits']} Q¢")
+            else:
+                print(f"• Quantum Credits: {effect['quantum_credits']} Q¢")
+                
+        if "exchange_rate_modifier" in effect:
+            print(f"• Exchange rates have been temporarily modified by {effect['exchange_rate_modifier'] * 100}%")
+            
+        if "exchange_fee_reduction" in effect:
+            print(f"• Exchange fees have been temporarily reduced by {effect['exchange_fee_reduction']}%")
+        
+        input("\nPress Enter to continue...")
+
+
 if __name__ == "__main__":
     game = MultiVerseTycoon()
     game.start_game()

@@ -42,7 +42,7 @@ class ResearchSystem:
                     "description": "Establish connections with local officials to reduce detection risk by 2 per turn.",
                     "cost": {"quantum_credits": 100},
                     "research_turns": 2,
-                    "effects": {"danger_reduction": 2},
+                    "effects": {"detection_risk_reduction": 2},
                     "required_level": 2,
                     "prerequisites": []
                 },
@@ -51,7 +51,7 @@ class ResearchSystem:
                     "description": "Use advanced technology to hide your true nature, reducing detection risk by 3 per turn.",
                     "cost": {"quantum_credits": 300},
                     "research_turns": 4,
-                    "effects": {"danger_reduction": 3},
+                    "effects": {"detection_risk_reduction": 3},
                     "required_level": 3,
                     "prerequisites": ["local_bribes"]
                 },
@@ -60,7 +60,7 @@ class ResearchSystem:
                     "description": "Partially phase your operations into another dimension, reducing detection risk by 5 per turn.",
                     "cost": {"quantum_credits": 700},
                     "research_turns": 7,
-                    "effects": {"danger_reduction": 5},
+                    "effects": {"detection_risk_reduction": 5},
                     "required_level": 5,
                     "prerequisites": ["identity_masking"]
                 }
@@ -234,7 +234,7 @@ class ResearchSystem:
         """Apply the effects of completed research to a universe."""
         effects = {
             "business_income_multiplier": 1.0,
-            "danger_reduction": 0,
+            "detection_risk_reduction": 0,
             "quantum_income": 0,
             "universe_level_reduction": 0,
             "universe_travel_discount": 0,
@@ -257,7 +257,7 @@ class ResearchSystem:
                         if effect_type == "business_income_multiplier":
                             # Multiplicative stacking for income multipliers
                             effects[effect_type] *= effect_value
-                        elif effect_type in ["danger_reduction", "quantum_income", "universe_level_reduction"]:
+                        elif effect_type in ["detection_risk_reduction", "quantum_income", "universe_level_reduction"]:
                             # Additive stacking for these effects
                             effects[effect_type] += effect_value
                         elif effect_type == "universe_travel_discount":

@@ -514,7 +514,7 @@ class MultiVerseTycoon:
             }
         }
 
-        self.DANGER_THRESHOLD = 100
+        self.DETECTION_RISK_THRESHOLD = 100  # Maximum allowed detection risk
         self.starting_cash = 10000
 
         # Initialize currency exchange system
@@ -631,7 +631,7 @@ class MultiVerseTycoon:
         for universe_id, universe in self.universes.items():
             self.player["universes"][universe_id] = {
                 "cash": self.starting_cash,
-                "danger": 0,
+                "danger": 0,  # This is now detection_risk but keeping variable name for compatibility
                 "reputation": 0,
                 "businesses": [],
                 "employees": []
@@ -808,9 +808,9 @@ class MultiVerseTycoon:
             if completed_count > 0:
                 print(f"Completed technologies: {completed_count}")
         
-        # Alert if danger level is getting high
+        # Alert if detection risk is getting high
         if player_universe_data['danger'] >= 80:
-            print("\n⚠️ WARNING: Detection risk critical! Consider stabilizing operations or relocating.")
+            print("\n⚠️ WARNING: Detection risk critical! Consider reducing risk or relocating.")
         elif player_universe_data['danger'] >= 60:
             print("\n⚠️ CAUTION: Detection risk elevated. Monitor situation closely.")
 
@@ -847,7 +847,7 @@ class MultiVerseTycoon:
             print("1. Start a new business")
             print("2. Hire employees")
             print("3. Fire employees")
-            print("4. Bribe officials (Reduce danger level)")
+            print("4. Reduce Detection Risk")
             
             # Only show unlocked features
             options = []
@@ -917,7 +917,7 @@ class MultiVerseTycoon:
             elif choice == "3":
                 self.fire_employee()
             elif choice == "4":
-                self.bribe_officials()
+                self.reduce_detection_risk()
             else:
                 # Process dynamic menu options
                 try:
@@ -974,10 +974,10 @@ class MultiVerseTycoon:
                 self.advance_turn()
 
             # Check for game over conditions
-            if player_universe_data["danger"] >= self.DANGER_THRESHOLD:
+            if player_universe_data["danger"] >= self.DETECTION_RISK_THRESHOLD:
                 self.player["game_over"] = True
                 self.player[
-                    "end_reason"] = f"Your danger level reached {self.DANGER_THRESHOLD} in the {universe['name']} universe!"
+                    "end_reason"] = f"Your detection risk reached {self.DETECTION_RISK_THRESHOLD} in the {universe['name']} universe!"
 
             # If game is over, show game over screen
             if self.player["game_over"]:
@@ -1043,7 +1043,7 @@ class MultiVerseTycoon:
                 player_universe_data["cash"] -= selected_business["cost"]
                 player_universe_data["businesses"].append(selected_business_id)
                 player_universe_data["danger"] += selected_business[
-                    "risk_increase"]
+                    "risk_increase"]  # Adding to detection risk
 
                 self.slow_print(
                     f"\nCongratulations! You now own a {selected_business['name']} in the {universe['name']} universe!"
@@ -1212,83 +1212,83 @@ class MultiVerseTycoon:
             time.sleep(0.75)  # Reduced delay for faster gameplay
             self.fire_employee()
 
-    def bribe_officials(self):
-        """Bribe officials to reduce danger level."""
+    def reduce_detection_risk(self):
+        """Reduce the detection risk through various countermeasures."""
         universe_id = self.player["current_universe"]
         universe = self.universes[universe_id]
         player_universe_data = self.player["universes"][universe_id]
 
         self.clear_screen()
-        print(f"\n=== Bribe Officials in {universe['name']} ===")
+        print(f"\n=== Reduce Detection Risk in {universe['name']} ===")
         print(
             f"Available Cash: {player_universe_data['cash']} {universe['currency']}"
         )
-        print(f"Current Danger Level: {player_universe_data['danger']}/100")
+        print(f"Current Detection Risk: {player_universe_data['danger']}/100")
 
-        # Calculate bribe options based on universe and current danger
-        small_bribe = 1000
-        medium_bribe = 3000
-        large_bribe = 7000
+        # Calculate countermeasure options based on universe and current risk
+        small_cost = 1000
+        medium_cost = 3000
+        large_cost = 7000
 
         small_reduction = 5
         medium_reduction = 15
         large_reduction = 35
 
         print(
-            f"\n1. Small Bribe: {small_bribe} {universe['currency']} (-{small_reduction} danger)"
+            f"\n1. Basic Countermeasures: {small_cost} {universe['currency']} (-{small_reduction} risk)"
         )
         print(
-            f"2. Medium Bribe: {medium_bribe} {universe['currency']} (-{medium_reduction} danger)"
+            f"2. Advanced Protocols: {medium_cost} {universe['currency']} (-{medium_reduction} risk)"
         )
         print(
-            f"3. Large Bribe: {large_bribe} {universe['currency']} (-{large_reduction} danger)"
+            f"3. Elite Security System: {large_cost} {universe['currency']} (-{large_reduction} risk)"
         )
         print("4. Cancel")
 
-        choice = input("\nChoose a bribe option: ")
+        choice = input("\nChoose a countermeasure option: ")
 
         if choice == "1":
-            if player_universe_data["cash"] < small_bribe:
+            if player_universe_data["cash"] < small_cost:
                 print(
-                    f"\nNot enough cash! You need {small_bribe} {universe['currency']}."
+                    f"\nNot enough cash! You need {small_cost} {universe['currency']}."
                 )
             else:
-                player_universe_data["cash"] -= small_bribe
+                player_universe_data["cash"] -= small_cost
                 player_universe_data["danger"] = max(
                     0, player_universe_data["danger"] - small_reduction)
                 print(
-                    f"\nYou bribed a minor official. Danger reduced by {small_reduction}."
+                    f"\nYou implemented basic security measures. Detection risk reduced by {small_reduction}."
                 )
         elif choice == "2":
-            if player_universe_data["cash"] < medium_bribe:
+            if player_universe_data["cash"] < medium_cost:
                 print(
-                    f"\nNot enough cash! You need {medium_bribe} {universe['currency']}."
+                    f"\nNot enough cash! You need {medium_cost} {universe['currency']}."
                 )
             else:
-                player_universe_data["cash"] -= medium_bribe
+                player_universe_data["cash"] -= medium_cost
                 player_universe_data["danger"] = max(
                     0, player_universe_data["danger"] - medium_reduction)
                 print(
-                    f"\nYou bribed a police captain. Danger reduced by {medium_reduction}."
+                    f"\nYou deployed advanced security protocols. Detection risk reduced by {medium_reduction}."
                 )
         elif choice == "3":
-            if player_universe_data["cash"] < large_bribe:
+            if player_universe_data["cash"] < large_cost:
                 print(
-                    f"\nNot enough cash! You need {large_bribe} {universe['currency']}."
+                    f"\nNot enough cash! You need {large_cost} {universe['currency']}."
                 )
             else:
-                player_universe_data["cash"] -= large_bribe
+                player_universe_data["cash"] -= large_cost
                 player_universe_data["danger"] = max(
                     0, player_universe_data["danger"] - large_reduction)
                 print(
-                    f"\nYou bribed a high-ranking government official. Danger reduced by {large_reduction}."
+                    f"\nYou installed an elite security system. Detection risk reduced by {large_reduction}."
                 )
         elif choice == "4":
             return
         else:
             print("\nInvalid choice. Please try again.")
             time.sleep(0.75)  # Reduced delay for faster gameplay
-            self.bribe_officials()
+            self.reduce_detection_risk()
             return
 
         input("\nPress Enter to continue...")
@@ -1326,7 +1326,7 @@ class MultiVerseTycoon:
             player_universe_data = self.player["universes"][universe_id]
             print(f"{i}. {universe['name']}")
             print(f"   Cash: {player_universe_data['cash']} {universe['currency']}")
-            print(f"   Danger Level: {player_universe_data['danger']}/100")
+            print(f"   Detection Risk: {player_universe_data['danger']}/100")
             print(f"   Businesses: {len(player_universe_data['businesses'])}")
             print(f"   Employees: {len(player_universe_data['employees'])}\n")
 
@@ -1384,11 +1384,11 @@ class MultiVerseTycoon:
         if turns_since_last_event < EVENT_COOLDOWN:
             return
 
-        # Calculate probability based on danger level
+        # Calculate probability based on detection risk level
         player_universe_data = self.player["universes"][universe_id]
-        danger_level = player_universe_data["danger"]
-        # Increase probability based on danger (up to +20%)
-        adjusted_probability = EVENT_PROBABILITY + (danger_level / 500)
+        detection_risk = player_universe_data["danger"]
+        # Increase probability based on detection risk (up to +20%)
+        adjusted_probability = EVENT_PROBABILITY + (detection_risk / 500)
 
         # Roll the dice - if random value is less than probability, trigger event
         if random.random() < adjusted_probability:
@@ -1433,10 +1433,10 @@ class MultiVerseTycoon:
 
         # Apply the event effects
         player_universe_data["cash"] += event["effect"]["cash"]
-        player_universe_data["danger"] += event["effect"]["danger"]
+        player_universe_data["danger"] += event["effect"]["danger"]  # danger is detection_risk
         player_universe_data["reputation"] += event["effect"]["reputation"]
 
-        # Ensure danger doesn't go below 0
+        # Ensure detection risk doesn't go below 0
         player_universe_data["danger"] = max(0, player_universe_data["danger"])
 
         print("\nEffect:")
@@ -1446,9 +1446,9 @@ class MultiVerseTycoon:
             print(f"• Cash: {event['effect']['cash']} {universe['currency']}")
 
         if event["effect"]["danger"] > 0:
-            print(f"• Danger: +{event['effect']['danger']}")
+            print(f"• Detection Risk: +{event['effect']['danger']}")
         else:
-            print(f"• Danger: {event['effect']['danger']}")
+            print(f"• Detection Risk: {event['effect']['danger']}")
 
         if event["effect"]["reputation"] > 0:
             print(f"• Reputation: +{event['effect']['reputation']}")
@@ -1600,22 +1600,22 @@ class MultiVerseTycoon:
 
         return total_salaries
 
-    def apply_danger_reductions(self):
-        """Apply danger reductions from employees."""
+    def apply_detection_risk_reductions(self):
+        """Apply detection risk reductions from employees."""
         universe_id = self.player["current_universe"]
         player_universe_data = self.player["universes"][universe_id]
 
         total_reduction = 0
 
-        # Calculate total danger reduction
+        # Calculate total detection risk reduction
         for employee in player_universe_data["employees"]:
             emp_type = self.employee_types[employee["type"]]
             total_reduction += emp_type["risk_reduction"]
         
-        # Apply research effects for danger reduction
+        # Apply research effects for detection risk reduction
         research_effects = self.research_system.apply_research_effects(self.player, universe_id)
-        if research_effects["danger_reduction"] > 0:
-            total_reduction += research_effects["danger_reduction"]
+        if research_effects["detection_risk_reduction"] > 0:
+            total_reduction += research_effects["detection_risk_reduction"]
 
         # Apply reduction
         if total_reduction > 0:
@@ -2666,8 +2666,8 @@ class MultiVerseTycoon:
         # Pay employee salaries
         salaries = self.pay_employee_salaries()
 
-        # Apply danger reductions from employees
-        danger_reduction = self.apply_danger_reductions()
+        # Apply detection risk reductions from employees
+        risk_reduction = self.apply_detection_risk_reductions()
 
         # Trigger a random event with probability
         self.maybe_trigger_random_event()
@@ -2721,8 +2721,8 @@ class MultiVerseTycoon:
         if research_effects["business_income_multiplier"] > 1.0:
             active_effects.append(f"Business Income Multiplier: {research_effects['business_income_multiplier']:.1f}x")
             
-        if research_effects["danger_reduction"] > 0:
-            active_effects.append(f"Detection Risk Reduction: -{research_effects['danger_reduction']} per turn")
+        if research_effects["detection_risk_reduction"] > 0:
+            active_effects.append(f"Detection Risk Reduction: -{research_effects['detection_risk_reduction']} per turn")
             
         if research_effects["quantum_income"] > 0:
             active_effects.append(f"Quantum Credits Income: +{research_effects['quantum_income']} Q¢ per turn")

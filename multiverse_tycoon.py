@@ -8,6 +8,7 @@ import sys
 from currency import CurrencyExchange, QuantumBusinesses, QuantumEvents
 from heists import HeistSystem
 from minigames import MiniGameSystem
+from research import ResearchSystem
 # Removed ad rewards import
 
 
@@ -38,13 +39,16 @@ class MultiVerseTycoon:
             "player_level": 1,  # Player's current level
             "experience": 0,  # Experience points
             "unlocked_universes": ["blade_runner"],  # List of unlocked universe IDs
+            "completed_research": [],  # List of completed research technologies
+            "current_research": {},  # Dictionary of technologies currently being researched
             "unlocked_features": {  # Features that have been unlocked by the player
                 "universe_travel": False,  # Ability to travel between universes
                 "currency_exchange": False,  # Ability to exchange currencies
                 "heist_operations": False,  # Ability to perform heists
                 "specialists": False,  # Ability to recruit specialists
                 "special_items": False,  # Ability to purchase special items
-                "mini_games": False  # Ability to play mini-games
+                "mini_games": False,  # Ability to play mini-games
+                "research": False  # Ability to research new technologies
             }
         }
 
@@ -531,6 +535,9 @@ class MultiVerseTycoon:
         
         # Initialize mini game system
         self.mini_game_system = MiniGameSystem()
+        
+        # Initialize research system
+        self.research_system = ResearchSystem()
 
     def clear_screen(self):
         """Clear the terminal screen."""
@@ -786,6 +793,21 @@ class MultiVerseTycoon:
         print(f"Network Spread: {sum(1 for universe_data in self.player['universes'].values() if len(universe_data['businesses']) > 0)}/{len(self.player['unlocked_universes'])} universes")
         print(f"Mission Cycle: {self.player['turn']}")
         
+        # Research status
+        if self.player['unlocked_features']['research']:
+            # Check current research
+            current_research = self.research_system.get_research_progress(self.player)
+            if current_research:
+                print("\n=== Research Division ===")
+                for tech_id, progress in current_research.items():
+                    print(f"Researching: {progress['name']} - {progress['progress_percent']}% complete")
+                    print(f"Turns remaining: {progress['turns_remaining']}")
+            
+            # Show completed research count
+            completed_count = len(self.player.get('completed_research', []))
+            if completed_count > 0:
+                print(f"Completed technologies: {completed_count}")
+        
         # Alert if danger level is getting high
         if player_universe_data['danger'] >= 80:
             print("\n⚠️ WARNING: Detection risk critical! Consider stabilizing operations or relocating.")
@@ -870,6 +892,11 @@ class MultiVerseTycoon:
                 options.append("mini_games")
                 option_index += 1
                 
+            if self.player["unlocked_features"]["research"]:
+                print(f"{option_index}. Research new technologies")
+                options.append("research")
+                option_index += 1
+                
             # Ad rewards option removed
             
             # Always available options
@@ -913,6 +940,8 @@ class MultiVerseTycoon:
                             self.purchase_special_items()
                         elif option == "mini_games":
                             self.play_mini_games()
+                        elif option == "research":
+                            self.research_menu()
                         # Ad rewards option removed
                         elif option == "save":
                             self.save_game()
@@ -1428,6 +1457,80 @@ class MultiVerseTycoon:
 
         input("\nPress Enter to continue...")
 
+    def research_menu(self):
+        """Display the research menu and handle research operations."""
+        while True:
+            self.clear_screen()
+            print("=== Quantum Research Division ===")
+            print("Develop advanced technologies to enhance your interdimensional operations.\n")
+            
+            print(f"Available Quantum Credits: {self.player['quantum_credits']}")
+            print()
+            
+            # Check current research
+            current_research = self.research_system.get_research_progress(self.player)
+            if current_research:
+                print("=== Current Research Projects ===")
+                for tech_id, progress in current_research.items():
+                    print(f"{progress['name']} - {progress['progress_percent']}% complete")
+                    print(f"Turns remaining: {progress['turns_remaining']}/{progress['total_turns']}")
+                print()
+            
+            # Get available technologies
+            available_techs = self.research_system.get_available_technologies(self.player)
+            
+            if not available_techs:
+                print("No technologies available for research at this time.")
+                print("Increase your operative level or complete current research projects to unlock more options.")
+                input("\nPress Enter to return to the main menu...")
+                return
+            
+            # Print menu options
+            print("=== Available Technologies ===")
+            options = []
+            for category, technologies in available_techs.items():
+                print(f"\n--- {category.replace('_', ' ').title()} Technologies ---")
+                for tech_id, tech in technologies.items():
+                    options.append((category, tech_id))
+                    print(f"{len(options)}. {tech['name']} - {tech['cost']['quantum_credits']} QC, {tech['research_turns']} turns")
+                    print(f"   {tech['description']}")
+            
+            print("\n0. Return to Main Menu")
+            
+            # Get user choice
+            try:
+                choice = input("\nSelect a technology to research: ")
+                if choice == "0":
+                    return
+                
+                choice_index = int(choice) - 1
+                if 0 <= choice_index < len(options):
+                    category, tech_id = options[choice_index]
+                    
+                    # Confirm research
+                    tech = available_techs[category][tech_id]
+                    print(f"\nYou are about to research: {tech['name']}")
+                    print(f"Cost: {tech['cost']['quantum_credits']} Quantum Credits")
+                    print(f"Duration: {tech['research_turns']} turns")
+                    print(f"Effect: {tech['description']}")
+                    
+                    confirm = input("\nConfirm research? (y/n): ")
+                    if confirm.lower() == "y":
+                        success, message = self.research_system.start_research(self.player, tech_id, category)
+                        print(f"\n{message}")
+                        input("\nPress Enter to continue...")
+                        
+                        if success:
+                            return
+                
+                else:
+                    print("\nInvalid choice. Please try again.")
+                    time.sleep(0.75)
+            
+            except ValueError:
+                print("\nInvalid input. Please enter a number.")
+                time.sleep(0.75)
+    
     def calculate_business_income(self):
         """Calculate and apply income from all businesses in the current universe."""
         universe_id = self.player["current_universe"]
@@ -1449,8 +1552,16 @@ class MultiVerseTycoon:
 
         total_income += employee_bonus
         
-        # Ad reward system removed
-
+        # Apply research effects
+        research_effects = self.research_system.apply_research_effects(self.player, universe_id)
+        if research_effects["business_income_multiplier"] > 1.0:
+            research_bonus = total_income * (research_effects["business_income_multiplier"] - 1.0)
+            total_income += research_bonus
+            
+        # Generate quantum income from research
+        if research_effects["quantum_income"] > 0:
+            self.player["quantum_credits"] += research_effects["quantum_income"]
+        
         # Apply income
         player_universe_data["cash"] += int(total_income)
 
@@ -1500,6 +1611,11 @@ class MultiVerseTycoon:
         for employee in player_universe_data["employees"]:
             emp_type = self.employee_types[employee["type"]]
             total_reduction += emp_type["risk_reduction"]
+        
+        # Apply research effects for danger reduction
+        research_effects = self.research_system.apply_research_effects(self.player, universe_id)
+        if research_effects["danger_reduction"] > 0:
+            total_reduction += research_effects["danger_reduction"]
 
         # Apply reduction
         if total_reduction > 0:
@@ -1529,6 +1645,14 @@ class MultiVerseTycoon:
             self.player["unlocked_features"]["mini_games"] = True
             print("\n🔓 New feature unlocked: Mini Games!")
             print("Play games to earn extra rewards!")
+            input("\nPress Enter to continue...")
+            
+        # Unlock research at turn 8
+        if self.player["turn"] >= 8 and not self.player["unlocked_features"]["research"]:
+            self.player["unlocked_features"]["research"] = True
+            print("\n🔓 New feature unlocked: Quantum Research Division!")
+            print("Research new technologies to enhance your interdimensional operations.")
+            print("Advanced technologies can help stabilize the multiverse faster!")
             input("\nPress Enter to continue...")
             
         # Unlock heist operations at turn 20
@@ -1572,10 +1696,20 @@ class MultiVerseTycoon:
             print("\n🌟 LEVEL UP! 🌟")
             print(f"You've reached level {self.player['player_level']}!")
             
+            # Get research effects
+            research_effects = self.research_system.apply_research_effects(self.player, self.player["current_universe"])
+            universe_level_reduction = research_effects["universe_level_reduction"]
+            ignore_requirements = research_effects["ignore_universe_requirements"]
+            
             # Check for newly unlocked universes
             newly_unlocked = []
             for universe_id, universe in self.universes.items():
-                if (universe["level_required"] == self.player["player_level"] and 
+                # Apply research effects to level requirements
+                effective_level_required = universe["level_required"] - universe_level_reduction
+                
+                if ((universe["level_required"] <= self.player["player_level"] or 
+                     effective_level_required <= self.player["player_level"] or
+                     ignore_requirements) and 
                     universe_id not in self.player["unlocked_universes"]):
                     # Unlock this universe
                     self.player["unlocked_universes"].append(universe_id)
@@ -2561,6 +2695,17 @@ class MultiVerseTycoon:
 
         # Check for new feature unlocks
         self.check_feature_unlocks()
+        
+        # Update research progress
+        completed_research = self.research_system.update_research(self.player)
+        if completed_research:
+            self.clear_screen()
+            print("\n=== Research Completed! ===")
+            for tech_id, tech_data in completed_research.items():
+                print(f"You have completed research on: {tech_data['name']}")
+                print(f"Effects: {', '.join([f'{k}: {v}' for k, v in tech_data['effects'].items()])}")
+                print()
+            input("\nPress Enter to continue...")
 
         # Display turn summary
         self.clear_screen()
@@ -2568,6 +2713,33 @@ class MultiVerseTycoon:
         print(f"Experience gained: {total_xp_gained} XP")
         print(f"Total XP: {self.player['experience']} / " + 
               f"{self.player['player_level'] * 1000} for next level")
+              
+        # Show research effects if any research is completed
+        research_effects = self.research_system.apply_research_effects(self.player, universe_id)
+        active_effects = []
+        
+        if research_effects["business_income_multiplier"] > 1.0:
+            active_effects.append(f"Business Income Multiplier: {research_effects['business_income_multiplier']:.1f}x")
+            
+        if research_effects["danger_reduction"] > 0:
+            active_effects.append(f"Detection Risk Reduction: -{research_effects['danger_reduction']} per turn")
+            
+        if research_effects["quantum_income"] > 0:
+            active_effects.append(f"Quantum Credits Income: +{research_effects['quantum_income']} Q¢ per turn")
+        
+        if research_effects["universe_level_reduction"] > 0:
+            active_effects.append(f"Universe Level Requirement: -{research_effects['universe_level_reduction']} levels")
+            
+        if research_effects["universe_travel_discount"] > 0:
+            active_effects.append(f"Universe Travel Cost: -{int(research_effects['universe_travel_discount'] * 100)}%")
+            
+        if research_effects["ignore_universe_requirements"]:
+            active_effects.append("Universe Requirements: Bypassed")
+            
+        if active_effects:
+            print("\n=== Active Research Effects ===")
+            for effect in active_effects:
+                print(f"• {effect}")
 
 
     def play_mini_games(self):

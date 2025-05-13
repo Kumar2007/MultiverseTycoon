@@ -9,7 +9,7 @@ from currency import CurrencyExchange, QuantumBusinesses, QuantumEvents
 from heists import HeistSystem
 from minigames import MiniGameSystem
 from research import ResearchSystem
-# Removed ad rewards import
+from achievements import AchievementSystem
 
 
 class MultiVerseTycoon:
@@ -538,6 +538,9 @@ class MultiVerseTycoon:
         
         # Initialize research system
         self.research_system = ResearchSystem()
+        
+        # Initialize achievement system
+        self.achievement_system = AchievementSystem()
 
     def clear_screen(self):
         """Clear the terminal screen."""
@@ -808,6 +811,14 @@ class MultiVerseTycoon:
             if completed_count > 0:
                 print(f"Completed technologies: {completed_count}")
         
+        # Display recent achievements (if any)
+        unlocked_achievements = self.achievement_system.get_unlocked_achievements()
+        recent_achievements = [a for a in unlocked_achievements if a.unlock_time and self.player["turn"] - a.unlock_time <= 3]
+        if recent_achievements:
+            print("\n🏆 Recent Achievements:")
+            for achievement in recent_achievements[:3]:  # Show max 3 recent achievements
+                print(f"- {achievement.name}: {achievement.description}")
+        
         # Alert if detection risk is getting high
         if player_universe_data['danger'] >= 80:
             print("\n⚠️ WARNING: Detection risk critical! Consider reducing risk or relocating.")
@@ -897,6 +908,11 @@ class MultiVerseTycoon:
                 options.append("research")
                 option_index += 1
                 
+            # Achievements are always available
+            print(f"{option_index}. View Achievements")
+            options.append("achievements")
+            option_index += 1
+                
             # Ad rewards option removed
             
             # Always available options
@@ -942,6 +958,8 @@ class MultiVerseTycoon:
                             self.play_mini_games()
                         elif option == "research":
                             self.research_menu()
+                        elif option == "achievements":
+                            self.achievements_menu()
                         # Ad rewards option removed
                         elif option == "save":
                             self.save_game()
@@ -1044,6 +1062,36 @@ class MultiVerseTycoon:
                 player_universe_data["businesses"].append(selected_business_id)
                 player_universe_data["danger"] += selected_business[
                     "risk_increase"]  # Adding to detection risk
+
+                # Update achievement stats
+                self.achievement_system.update_stats("businesses_started")
+                self.achievement_system.update_stats(f"businesses_in_{universe_id}")
+                
+                # Check for total businesses achievement threshold
+                total_businesses = 0
+                for uni_id in self.player["universes"]:
+                    total_businesses += len(self.player["universes"][uni_id]["businesses"])
+                self.achievement_system.stats["total_businesses"] = total_businesses
+                
+                # Check for new achievements
+                newly_unlocked = self.achievement_system.check_achievements(self.player)
+                if newly_unlocked:
+                    print("\n🏆 ACHIEVEMENTS UNLOCKED:")
+                    for achievement in newly_unlocked:
+                        reward_text = []
+                        if achievement.reward_cash > 0:
+                            reward_text.append(f"{achievement.reward_cash} {universe['currency']}")
+                            # Add the cash reward to player's account
+                            player_universe_data["cash"] += achievement.reward_cash
+                        if achievement.reward_quantum > 0:
+                            reward_text.append(f"{achievement.reward_quantum} Quantum Credits")
+                            # Add the quantum reward
+                            self.player["quantum_credits"] += achievement.reward_quantum
+                        reward_str = " and ".join(reward_text)
+                        
+                        print(f"- {achievement.name}: {achievement.description}")
+                        if reward_str:
+                            print(f"  Reward: {reward_str}")
 
                 self.slow_print(
                     f"\nCongratulations! You now own a {selected_business['name']} in the {universe['name']} universe!"
@@ -1349,6 +1397,37 @@ class MultiVerseTycoon:
 
                 # Jump to the selected universe
                 self.player["current_universe"] = target_universe_id
+                
+                # Update achievement stats for universe jumps
+                self.achievement_system.update_stats("universe_jumps")
+                self.achievement_system.stats["universe_visited"][target_universe_id] = True
+                
+                # Count how many different universes have been visited
+                universes_visited = sum(1 for uni_id, visited in 
+                                      self.achievement_system.stats.get("universe_visited", {}).items() 
+                                      if visited)
+                self.achievement_system.stats["different_universes_visited"] = universes_visited
+                
+                # Check for achievements
+                newly_unlocked = self.achievement_system.check_achievements(self.player)
+                if newly_unlocked:
+                    print("\n🏆 ACHIEVEMENTS UNLOCKED:")
+                    for achievement in newly_unlocked:
+                        reward_text = []
+                        target_universe = self.universes[target_universe_id]
+                        if achievement.reward_cash > 0:
+                            reward_text.append(f"{achievement.reward_cash} {target_universe['currency']}")
+                            # Add the cash reward to player's account
+                            self.player["universes"][target_universe_id]["cash"] += achievement.reward_cash
+                        if achievement.reward_quantum > 0:
+                            reward_text.append(f"{achievement.reward_quantum} Quantum Credits")
+                            # Add the quantum reward
+                            self.player["quantum_credits"] += achievement.reward_quantum
+                        reward_str = " and ".join(reward_text)
+                        
+                        print(f"- {achievement.name}: {achievement.description}")
+                        if reward_str:
+                            print(f"  Reward: {reward_str}")
 
                 self.slow_print(
                     f"\nYou've jumped to the {self.universes[target_universe_id]['name']} universe!"
@@ -2041,7 +2120,7 @@ class MultiVerseTycoon:
                     player_universe_data["danger"] += business["risk_increase"]
 
                     # Check if danger level exceeds threshold
-                    if player_universe_data["danger"] >= self.DANGER_THRESHOLD:
+                    if player_universe_data["danger"] >= self.DETECTION_RISK_THRESHOLD:
                         self.player["game_over"] = True
                         self.player[
                             "end_reason"] = f"Your operation in the {self.universes[universe_id]['name']} universe was discovered!"
@@ -2396,7 +2475,7 @@ class MultiVerseTycoon:
             print(f"\nDanger level increased by {danger_increase}!")
 
             # Check if danger level exceeds threshold
-            if player_universe_data["danger"] >= self.DANGER_THRESHOLD:
+            if player_universe_data["danger"] >= self.DETECTION_RISK_THRESHOLD:
                 self.player["game_over"] = True
                 self.player[
                     "end_reason"] = f"Your heist operation in {universe['name']} was discovered by authorities!"
@@ -2696,6 +2775,24 @@ class MultiVerseTycoon:
         # Check for new feature unlocks
         self.check_feature_unlocks()
         
+        # Check for newly unlocked achievements
+        newly_unlocked = self.achievement_system.check_achievements(self.player)
+        if newly_unlocked:
+            self.clear_screen()
+            print("\n🏆 ACHIEVEMENTS UNLOCKED:")
+            for achievement in newly_unlocked:
+                reward_text = []
+                if achievement.reward_cash > 0:
+                    reward_text.append(f"{achievement.reward_cash} cash")
+                if achievement.reward_quantum > 0:
+                    reward_text.append(f"{achievement.reward_quantum} Quantum Credits")
+                reward_str = " and ".join(reward_text)
+                
+                print(f"- {achievement.name}: {achievement.description}")
+                if reward_str:
+                    print(f"  Reward: {reward_str}")
+            input("\nPress Enter to continue...")
+        
         # Update research progress
         completed_research = self.research_system.update_research(self.player)
         if completed_research:
@@ -2741,6 +2838,111 @@ class MultiVerseTycoon:
             for effect in active_effects:
                 print(f"• {effect}")
 
+
+    def achievements_menu(self):
+        """Display the achievements menu and view achievement progress."""
+        while True:
+            self.clear_screen()
+            print("\n=== ACHIEVEMENTS ===")
+            
+            # Get all achievements (both locked and unlocked)
+            all_achievements = self.achievement_system.achievements
+            unlocked_achievements = self.achievement_system.get_unlocked_achievements()
+            unlocked_ids = [a.id for a in unlocked_achievements]
+            
+            # Count unlocked achievements
+            total_achievements = len(all_achievements)
+            unlocked_count = len(unlocked_achievements)
+            
+            print(f"\nProgress: {unlocked_count}/{total_achievements} achievements unlocked ({int(unlocked_count/total_achievements*100)}%)")
+            
+            # Get achievement progress for upcoming achievements
+            progress_report = self.achievement_system.get_progress_report(self.player)
+            
+            print("\n1. View Unlocked Achievements")
+            print("2. View Locked Achievements")
+            print("3. View Achievement Progress")
+            print("4. Back to Main Menu")
+            
+            choice = input("\nSelect an option: ")
+            
+            if choice == "1":
+                # View unlocked achievements
+                self.clear_screen()
+                print("\n=== UNLOCKED ACHIEVEMENTS ===")
+                
+                if not unlocked_achievements:
+                    print("\nYou haven't unlocked any achievements yet.")
+                else:
+                    for achievement in unlocked_achievements:
+                        reward_text = []
+                        if achievement.reward_cash > 0:
+                            reward_text.append(f"{achievement.reward_cash} cash")
+                        if achievement.reward_quantum > 0:
+                            reward_text.append(f"{achievement.reward_quantum} Quantum Credits")
+                        reward_str = " and ".join(reward_text)
+                        
+                        print(f"\n🏆 {achievement.name}")
+                        print(f"   {achievement.description}")
+                        if reward_str:
+                            print(f"   Reward: {reward_str}")
+                
+                input("\nPress Enter to continue...")
+                
+            elif choice == "2":
+                # View locked achievements
+                self.clear_screen()
+                print("\n=== LOCKED ACHIEVEMENTS ===")
+                
+                locked_achievements = [a for a in all_achievements.values() if a.id not in unlocked_ids]
+                
+                if not locked_achievements:
+                    print("\nCongratulations! You've unlocked all achievements!")
+                else:
+                    for achievement in locked_achievements:
+                        reward_text = []
+                        if achievement.reward_cash > 0:
+                            reward_text.append(f"{achievement.reward_cash} cash")
+                        if achievement.reward_quantum > 0:
+                            reward_text.append(f"{achievement.reward_quantum} Quantum Credits")
+                        reward_str = " and ".join(reward_text)
+                        
+                        # Don't show hidden achievement details
+                        if achievement.hidden:
+                            print(f"\n🔒 [Hidden Achievement]")
+                            print(f"   Complete special actions to discover this achievement")
+                        else:
+                            print(f"\n🔒 {achievement.name}")
+                            print(f"   {achievement.description}")
+                            if reward_str:
+                                print(f"   Reward: {reward_str}")
+                
+                input("\nPress Enter to continue...")
+                
+            elif choice == "3":
+                # View achievement progress
+                self.clear_screen()
+                print("\n=== ACHIEVEMENT PROGRESS ===")
+                
+                if not progress_report:
+                    print("\nNo achievement progress data available.")
+                else:
+                    for achievement_id, progress_data in progress_report.items():
+                        achievement = all_achievements[achievement_id]
+                        print(f"\n➤ {achievement.name}")
+                        print(f"   {achievement.description}")
+                        print(f"   Progress: {progress_data['current']}/{progress_data['required']} " + 
+                              f"({int(progress_data['current']/progress_data['required']*100)}%)")
+                
+                input("\nPress Enter to continue...")
+                
+            elif choice == "4":
+                # Back to main menu
+                return
+            
+            else:
+                print("\nInvalid choice. Please try again.")
+                time.sleep(0.75)
 
     def play_mini_games(self):
         """Play mini games to earn rewards."""

@@ -516,12 +516,8 @@ To download and play Multiverse Tycoon, follow these steps:
 
 #### Option 1: Download the Release Package (Recommended for players)
 
-1. Go to the [Releases page](https://github.com/yourusername/multiverse-tycoon/releases) on GitHub
-2. Download the appropriate zip file for your operating system:
-   - `MultiVerseTycoon_Windows.zip` for Windows
-   - `MultiVerseTycoon_MacOS.zip` for macOS
-   - `MultiVerseTycoon_Linux.zip` for Linux
-3. Extract the zip file to a folder of your choice
+1. Download the zip file containing the game
+2. Extract the zip file to a folder of your choice
 
 #### Option 2: Clone the Repository (For developers or contributors)
 

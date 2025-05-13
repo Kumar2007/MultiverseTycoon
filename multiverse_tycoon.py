@@ -1182,17 +1182,19 @@ class MultiVerseTycoon:
                 f"   Risk Reduction: -{emp_type['risk_reduction']} danger/turn\n"
             )
 
-        print(f"{len(self.employee_types) + 1}. Cancel")
+        # Create a list of employee types to show
+        available_employees = list(self.employee_types.items())
+        print(f"{len(available_employees) + 1}. Cancel")
 
         try:
             choice = int(
                 input("\nWhich type of employee would you like to hire? "))
 
-            if choice == len(self.employee_types) + 1:
+            if choice == len(available_employees) + 1:
                 return
 
-            if 1 <= choice <= len(self.employee_types):
-                emp_id = list(self.employee_types.keys())[choice - 1]
+            if 1 <= choice <= len(available_employees):
+                emp_id = available_employees[choice - 1][0]
                 emp_type = self.employee_types[emp_id]
 
                 if player_universe_data["cash"] < emp_type["hiring_cost"]:
@@ -1455,16 +1457,16 @@ class MultiVerseTycoon:
             print(f"   Businesses: {len(player_universe_data['businesses'])}")
             print(f"   Employees: {len(player_universe_data['employees'])}\n")
 
-        print(f"{len(self.universes) + 1}. Cancel")
+        print(f"{len(available_universes) + 1}. Cancel")
 
         try:
             choice = int(input("\nWhich universe would you like to jump to? "))
 
-            if choice == len(self.universes) + 1:
+            if choice == len(available_universes) + 1:
                 return
 
-            if 1 <= choice <= len(self.universes):
-                target_universe_id = list(self.universes.keys())[choice - 1]
+            if 1 <= choice <= len(available_universes):
+                target_universe_id = available_universes[choice - 1][0]
 
                 # If selected the current universe
                 if target_universe_id == current_universe_id:
@@ -2375,7 +2377,8 @@ class MultiVerseTycoon:
                     return
 
                 if 1 <= choice <= len(available_businesses):
-                    business_id = list(available_businesses.keys())[choice - 1]
+                    business_ids = list(available_businesses.keys())
+                    business_id = business_ids[choice - 1]
                     business = available_businesses[business_id]
 
                     # Check if player has enough quantum credits

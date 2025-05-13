@@ -10,6 +10,7 @@ from heists import HeistSystem
 from minigames import MiniGameSystem
 from research import ResearchSystem
 from achievements import AchievementSystem
+from quests import QuestSystem
 
 
 class MultiVerseTycoon:
@@ -541,6 +542,9 @@ class MultiVerseTycoon:
         
         # Initialize achievement system
         self.achievement_system = AchievementSystem()
+        
+        # Initialize quest system
+        self.quest_system = QuestSystem()
 
     def clear_screen(self):
         """Clear the terminal screen."""
@@ -819,6 +823,13 @@ class MultiVerseTycoon:
             for achievement in recent_achievements[:3]:  # Show max 3 recent achievements
                 print(f"- {achievement.name}: {achievement.description}")
         
+        # Display current quest objectives (if any)
+        quest_suggestions = self.quest_system.get_quest_suggestions(self.player)
+        if quest_suggestions:
+            print("\n📋 Current Quests:")
+            for suggestion in quest_suggestions[:2]:  # Show max 2 active quest objectives
+                print(f"- {suggestion['quest_name']}: {suggestion['objective']} ({suggestion['progress']})")
+        
         # Alert if detection risk is getting high
         if player_universe_data['danger'] >= 80:
             print("\n⚠️ WARNING: Detection risk critical! Consider reducing risk or relocating.")
@@ -912,6 +923,11 @@ class MultiVerseTycoon:
             print(f"{option_index}. View Achievements")
             options.append("achievements")
             option_index += 1
+            
+            # Quests are always available
+            print(f"{option_index}. View Quests")
+            options.append("quests")
+            option_index += 1
                 
             # Ad rewards option removed
             
@@ -960,6 +976,8 @@ class MultiVerseTycoon:
                             self.research_menu()
                         elif option == "achievements":
                             self.achievements_menu()
+                        elif option == "quests":
+                            self.quests_menu()
                         # Ad rewards option removed
                         elif option == "save":
                             self.save_game()
@@ -1092,6 +1110,36 @@ class MultiVerseTycoon:
                         print(f"- {achievement.name}: {achievement.description}")
                         if reward_str:
                             print(f"  Reward: {reward_str}")
+                
+                # Check for quest progress - business started
+                completed_quests = self.quest_system.check_and_update_quests(
+                    self.player, "business_started", universe_id=universe_id)
+                
+                # Also track specific business ownership for quests
+                self.quest_system.check_and_update_quests(
+                    self.player, "specific_business_owned", value=selected_business_id)
+                
+                # Award rewards for any completed quests
+                if completed_quests:
+                    print("\n📋 QUESTS COMPLETED:")
+                    
+                    for quest_id in completed_quests:
+                        quest = self.quest_system.quests[quest_id]
+                        print(f"\n✓ {quest.name}")
+                        print(f"  {quest.description}")
+                        
+                        # Apply rewards
+                        if quest.rewards["cash"] > 0:
+                            player_universe_data["cash"] += quest.rewards["cash"]
+                            print(f"  + {quest.rewards['cash']} {universe['currency']}")
+                        
+                        if quest.rewards["quantum"] > 0:
+                            self.player["quantum_credits"] += quest.rewards["quantum"]
+                            print(f"  + {quest.rewards['quantum']} Quantum Credits")
+                        
+                        if quest.rewards["xp"] > 0:
+                            self.player["experience"] += quest.rewards["xp"]
+                            print(f"  + {quest.rewards['xp']} XP")
 
                 self.slow_print(
                     f"\nCongratulations! You now own a {selected_business['name']} in the {universe['name']} universe!"
@@ -1160,6 +1208,35 @@ class MultiVerseTycoon:
                     "type": emp_id,
                     "loyalty": 100  # Starting loyalty
                 })
+                
+                # Update achievement stats
+                self.achievement_system.update_stats("employees_hired")
+                
+                # Update quest progress - employee hired
+                completed_quests = self.quest_system.check_and_update_quests(
+                    self.player, "employee_hired", universe_id=universe_id)
+                
+                # Award rewards for any completed quests
+                if completed_quests:
+                    print("\n📋 QUESTS COMPLETED:")
+                    
+                    for quest_id in completed_quests:
+                        quest = self.quest_system.quests[quest_id]
+                        print(f"\n✓ {quest.name}")
+                        print(f"  {quest.description}")
+                        
+                        # Apply rewards
+                        if quest.rewards["cash"] > 0:
+                            player_universe_data["cash"] += quest.rewards["cash"]
+                            print(f"  + {quest.rewards['cash']} {universe['currency']}")
+                        
+                        if quest.rewards["quantum"] > 0:
+                            self.player["quantum_credits"] += quest.rewards["quantum"]
+                            print(f"  + {quest.rewards['quantum']} Quantum Credits")
+                        
+                        if quest.rewards["xp"] > 0:
+                            self.player["experience"] += quest.rewards["xp"]
+                            print(f"  + {quest.rewards['xp']} XP")
 
                 self.slow_print(
                     f"\nYou've hired a {emp_type['name']} in the {universe['name']} universe!"
@@ -1428,6 +1505,40 @@ class MultiVerseTycoon:
                         print(f"- {achievement.name}: {achievement.description}")
                         if reward_str:
                             print(f"  Reward: {reward_str}")
+                
+                # Save a reference to the target universe for later use
+                target_universe = self.universes[target_universe_id]
+                
+                # Update quest progress - universe jump
+                completed_quests = self.quest_system.check_and_update_quests(
+                    self.player, "universe_jump", value=1, universe_id=target_universe_id)
+                
+                # Also track specific universe visits for quests - we use None for the default value
+                # to avoid type issues
+                self.quest_system.check_and_update_quests(
+                    self.player, "specific_universe_visited", value=target_universe_id, universe_id=None)
+                
+                # Award rewards for any completed quests
+                if completed_quests:
+                    print("\n📋 QUESTS COMPLETED:")
+                    
+                    for quest_id in completed_quests:
+                        quest = self.quest_system.quests[quest_id]
+                        print(f"\n✓ {quest.name}")
+                        print(f"  {quest.description}")
+                        
+                        # Apply rewards
+                        if quest.rewards["cash"] > 0:
+                            self.player["universes"][target_universe_id]["cash"] += quest.rewards["cash"]
+                            print(f"  + {quest.rewards['cash']} {target_universe['currency']}")
+                        
+                        if quest.rewards["quantum"] > 0:
+                            self.player["quantum_credits"] += quest.rewards["quantum"]
+                            print(f"  + {quest.rewards['quantum']} Quantum Credits")
+                        
+                        if quest.rewards["xp"] > 0:
+                            self.player["experience"] += quest.rewards["xp"]
+                            print(f"  + {quest.rewards['xp']} XP")
 
                 self.slow_print(
                     f"\nYou've jumped to the {self.universes[target_universe_id]['name']} universe!"
@@ -2793,6 +2904,35 @@ class MultiVerseTycoon:
                     print(f"  Reward: {reward_str}")
             input("\nPress Enter to continue...")
         
+        # Update quest progress for turn completion
+        completed_quests = self.quest_system.check_and_update_quests(
+            self.player, "turn_completed")
+        
+        # Award rewards for any completed quests
+        if completed_quests:
+            self.clear_screen()
+            print("\n📋 QUESTS COMPLETED:")
+            
+            for quest_id in completed_quests:
+                quest = self.quest_system.quests[quest_id]
+                print(f"\n✓ {quest.name}")
+                print(f"  {quest.description}")
+                
+                # Apply rewards
+                if quest.rewards["cash"] > 0:
+                    self.player["universes"][universe_id]["cash"] += quest.rewards["cash"]
+                    print(f"  + {quest.rewards['cash']} {universe['currency']}")
+                
+                if quest.rewards["quantum"] > 0:
+                    self.player["quantum_credits"] += quest.rewards["quantum"]
+                    print(f"  + {quest.rewards['quantum']} Quantum Credits")
+                
+                if quest.rewards["xp"] > 0:
+                    self.player["experience"] += quest.rewards["xp"]
+                    print(f"  + {quest.rewards['xp']} XP")
+            
+            input("\nPress Enter to continue...")
+        
         # Update research progress
         completed_research = self.research_system.update_research(self.player)
         if completed_research:
@@ -2839,6 +2979,131 @@ class MultiVerseTycoon:
                 print(f"• {effect}")
 
 
+    def quests_menu(self):
+        """Display the quests menu and manage active quests."""
+        while True:
+            self.clear_screen()
+            print("\n=== QUESTS ===")
+            
+            # Get active quests with progress
+            active_quests = self.quest_system.get_active_quests_with_progress()
+            
+            # Get completed quests
+            completed_quests = [self.quest_system.quests[quest_id] for quest_id in self.quest_system.completed_quests]
+            
+            # Get available quests
+            available_quests = self.quest_system.get_available_quests(self.player)
+            
+            # Display quest suggestions based on active quests
+            suggestions = self.quest_system.get_quest_suggestions(self.player)
+            if suggestions:
+                print("\n🔍 SUGGESTED TASKS:")
+                for suggestion in suggestions[:3]:  # Show top 3 suggestions
+                    print(f"• {suggestion['quest_name']}: {suggestion['objective']} - Progress: {suggestion['progress']}")
+            
+            print("\n1. View Active Quests")
+            print("2. View Available Quests")
+            print("3. View Completed Quests")
+            print("4. Back to Main Menu")
+            
+            choice = input("\nSelect an option: ")
+            
+            if choice == "1":
+                # View active quests
+                self.clear_screen()
+                print("\n=== ACTIVE QUESTS ===")
+                
+                if not active_quests:
+                    print("\nYou don't have any active quests.")
+                else:
+                    for quest in active_quests:
+                        print(f"\n📋 {quest.name}")
+                        print(f"   {quest.description}")
+                        print("\n   Objectives:")
+                        for objective in quest.objectives:
+                            status = "✓" if objective["completed"] else "➤"
+                            print(f"   {status} {objective['description']} - Progress: {objective['current']}/{objective['target']}")
+                        
+                        print("\n   Rewards:")
+                        if quest.rewards["cash"] > 0:
+                            universe_id = self.player["current_universe"]
+                            universe = self.universes[universe_id]
+                            print(f"   • {quest.rewards['cash']} {universe['currency']}")
+                        if quest.rewards["quantum"] > 0:
+                            print(f"   • {quest.rewards['quantum']} Quantum Credits")
+                        if quest.rewards["xp"] > 0:
+                            print(f"   • {quest.rewards['xp']} XP")
+                
+                input("\nPress Enter to continue...")
+                
+            elif choice == "2":
+                # View available quests
+                self.clear_screen()
+                print("\n=== AVAILABLE QUESTS ===")
+                
+                if not available_quests:
+                    print("\nNo new quests available at this time.")
+                    print("Progress further in the game to unlock more quests.")
+                else:
+                    for i, quest in enumerate(available_quests, 1):
+                        print(f"\n{i}. {quest.name}")
+                        print(f"   {quest.description}")
+                        
+                        print("\n   Rewards:")
+                        if quest.rewards["cash"] > 0:
+                            universe_id = self.player["current_universe"]
+                            universe = self.universes[universe_id]
+                            print(f"   • {quest.rewards['cash']} {universe['currency']}")
+                        if quest.rewards["quantum"] > 0:
+                            print(f"   • {quest.rewards['quantum']} Quantum Credits")
+                        if quest.rewards["xp"] > 0:
+                            print(f"   • {quest.rewards['xp']} XP")
+                    
+                    print("\n0. Back")
+                    
+                    try:
+                        quest_choice = int(input("\nActivate a quest (0 to go back): "))
+                        if 1 <= quest_choice <= len(available_quests):
+                            selected_quest = available_quests[quest_choice - 1]
+                            if self.quest_system.activate_quest(selected_quest.id):
+                                print(f"\n✓ Quest '{selected_quest.name}' activated!")
+                            else:
+                                print("\nFailed to activate quest. Prerequisites may not be met.")
+                            input("\nPress Enter to continue...")
+                    except ValueError:
+                        print("\nPlease enter a valid number.")
+                        time.sleep(0.75)
+                
+            elif choice == "3":
+                # View completed quests
+                self.clear_screen()
+                print("\n=== COMPLETED QUESTS ===")
+                
+                if not completed_quests:
+                    print("\nYou haven't completed any quests yet.")
+                else:
+                    for quest in completed_quests:
+                        print(f"\n✓ {quest.name}")
+                        print(f"   {quest.description}")
+                        
+                        print("\n   Rewards Received:")
+                        if quest.rewards["cash"] > 0:
+                            print(f"   • {quest.rewards['cash']} Local Currency")
+                        if quest.rewards["quantum"] > 0:
+                            print(f"   • {quest.rewards['quantum']} Quantum Credits")
+                        if quest.rewards["xp"] > 0:
+                            print(f"   • {quest.rewards['xp']} XP")
+                
+                input("\nPress Enter to continue...")
+                
+            elif choice == "4":
+                # Back to main menu
+                return
+            
+            else:
+                print("\nInvalid choice. Please try again.")
+                time.sleep(0.75)
+                
     def achievements_menu(self):
         """Display the achievements menu and view achievement progress."""
         while True:

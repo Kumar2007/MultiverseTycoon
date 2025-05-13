@@ -1,0 +1,25 @@
+╔════════════════════════════════════════════════════════════╗
+║                    UNIVERSE SELECTION                        ║
+╠════════════════════════════════════════════════════════════╣
+║                                                            ║
+║  1. [UNLOCKED] Blade Runner                                ║
+║     Currency: Credits  | Risk: LOW | Tech Level: HIGH      ║
+║                                                            ║
+║  2. [UNLOCKED] GTA V                                       ║
+║     Currency: Dollars  | Risk: HIGH | Tech Level: MEDIUM   ║
+║                                                            ║
+║  3. [LOCKED] Marvel Cinematic Universe                     ║
+║     Unlocks at Level 3                                     ║
+║                                                            ║
+║  4. [LOCKED] Doraemon                                      ║
+║     Unlocks at Level 4                                     ║
+║                                                            ║
+║  5. [LOCKED] Wizarding World                               ║
+║     Unlocks at Level 5                                     ║
+║                                                            ║
+║  6. [LOCKED] Dark                                          ║
+║     Unlocks at Level 6                                     ║
+║                                                            ║
+║  7. Return to main menu                                    ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝

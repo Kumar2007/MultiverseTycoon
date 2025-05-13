@@ -1,0 +1,25 @@
+╔════════════════════════════════════════════════════════════╗
+║                BLADE RUNNER UNIVERSE                        ║
+║                   BUSINESSES                                ║
+╠════════════════════════════════════════════════════════════╣
+║                                                            ║
+║  OWNED BUSINESSES:                                         ║
+║  ✓ Surveillance Tech      Income: 1200 Credits/turn        ║
+║  ✓ Memory Implants        Income: 1800 Credits/turn        ║
+║                                                            ║
+║  AVAILABLE BUSINESSES:                                     ║
+║  1. Replicant Repair      Cost: 5000 Credits               ║
+║     Expected Income: 750 Credits/turn                      ║
+║     Risk Increase: +7%                                     ║
+║                                                            ║
+║  2. Flying Car Service    Cost: 12000 Credits              ║
+║     Expected Income: 2000 Credits/turn                     ║
+║     Risk Increase: +12%                                    ║
+║                                                            ║
+║  3. Biotech Lab           Cost: 25000 Credits              ║
+║     Expected Income: 4500 Credits/turn                     ║
+║     Risk Increase: +18%                                    ║
+║                                                            ║
+║  4. Return to Main Menu                                    ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝

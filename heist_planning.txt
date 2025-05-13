@@ -1,0 +1,35 @@
+╔════════════════════════════════════════════════════════════╗
+║                     HEIST PLANNING                          ║
+║                     GTA V UNIVERSE                          ║
+╠════════════════════════════════════════════════════════════╣
+║                                                            ║
+║  TARGET: Pacific Standard Bank                             ║
+║  POTENTIAL REWARD: 50,000 - 200,000 Dollars                ║
+║                                                            ║
+║  DIFFICULTY:                                               ║
+║  1. [Easy]   Success Rate: 75%  Reward Multiplier: x0.5    ║
+║  2. [Medium] Success Rate: 50%  Reward Multiplier: x1.0    ║
+║  3. [Hard]   Success Rate: 30%  Reward Multiplier: x2.0    ║
+║                                                            ║
+║  CREW MEMBERS:                                             ║
+║  ✓ Driver       - Franklin     Skill: 85%  Cut: 15%        ║
+║  ✓ Hacker       - Lester       Skill: 92%  Cut: 20%        ║
+║  ✓ Gunman       - Trevor       Skill: 95%  Cut: 25%        ║
+║  ✓ Coordinator  - Michael      Skill: 88%  Cut: 20%        ║
+║                                                            ║
+║  EQUIPMENT:                                                ║
+║  ✓ Thermal Charges      +10% Success Rate                  ║
+║  ✓ Police Interceptor   +5% Success Rate                   ║
+║  ✗ Disguise Kit         Not Purchased                      ║
+║  ✗ Inside Information   Not Purchased                      ║
+║                                                            ║
+║  YOUR CURRENT TAKE: 20% of total (After crew payment)      ║
+║  ESTIMATED PAYOUT: 15,000 - 60,000 Dollars                 ║
+║                                                            ║
+║  1. Change Difficulty                                      ║
+║  2. Modify Crew                                            ║
+║  3. Purchase Equipment                                     ║
+║  4. Execute Heist                                          ║
+║  5. Cancel and Return                                      ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝

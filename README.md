@@ -50,9 +50,51 @@ forcing a permanent retreat from that reality.
 The fate of all realities rests in your hands. Good luck, Tycoon.
 ```
 
-## The Final Chapter
+## The Final Chapters
 
-As you establish successful businesses across all six universes and accumulate significant quantum wealth, you'll eventually unlock the final chapter of your interdimensional journey.
+As you build your multiverse business empire, the story evolves dynamically based on your performance, with multiple possible narrative conclusions.
+
+### The Victory Path
+
+The ultimate achievement is reaching level 10 while establishing a robust business network across nearly all universes:
+
+```
+╔══════════════════════════════════════════════════════════════════════════╗
+║                        QUANTUM CORPORATION                                ║
+║                     MISSION STATUS: TRIUMPHANT                            ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+[PRIORITY TRANSMISSION]
+FROM: Dr. Eleanor Quantum, Founder & CEO
+TO: Supreme Operative [Your Name]
+SUBJECT: The Nexus Event
+
+The Quantum Stabilization Matrix is now operating at 100% efficiency
+across all monitored universes. The fractures that once threatened
+to collapse our multiverse have not only been sealed but have been
+transformed into something altogether new.
+
+Our scientists have detected what we're calling the 'Nexus Event' - 
+a fundamental restructuring of the multiversal fabric. Your business
+network, spanning across all identified realities, has created a
+self-reinforcing quantum lattice that has essentially 'upgraded'
+the multiverse itself.
+
+The barriers between universes are now permanently stabilized, allowing
+for safe, controlled travel between realities. More importantly, we've
+detected the formation of new universes - realities that didn't exist
+before our intervention. The multiverse is growing, healing, evolving.
+
+The Board has unanimously voted to officially rename the company
+to 'Nexus Corporation' and has created a new position specifically
+for you: Supreme Architect of the Multiverse.
+
+The possibilities are infinite.
+```
+
+### The Multiversal Crisis
+
+Alternatively, if you accumulate substantial resources but uncover disturbing truths about the Quantum Corporation, you'll face a difficult decision:
 
 ```
 === THE QUANTUM CORPORATION ===
@@ -84,7 +126,17 @@ Whatever you decide will permanently alter the fate of countless realities.
 The multiverse awaits your decision, Tycoon.
 ```
 
-Your final decision will determine one of three distinct endings, each with different consequences for the multiverse and rewards for your character.
+### Performance-Based Outcomes
+
+The game also features several endings that dynamically respond to your performance, including:
+
+- **Legendary Success**: Become the Interdimensional Ambassador with authority across all realities
+- **Great Success**: Be promoted to Director of Multiverse Operations with a stable network
+- **Moderate Success**: Contribute valuable data to ongoing stabilization efforts
+- **High Risk**: Trigger emergency protocols when your detection levels threaten the multiverse
+- **Failure**: Witness the beginning of multiversal collapse due to insufficient stabilization
+
+Each ending features unique narrative elements, with different consequences for each universe you've visited and personalized epilogues based on your choices throughout the game.
 
 ## Game Concept
 
@@ -596,18 +648,56 @@ If you encounter any issues:
 
 ## Game Endings
 
-When you reach the endgame by establishing businesses in all universes and accumulating enough Quantum Credits, you'll face the final decision with three possible outcomes:
+Your journey through the multiverse can end in various ways, each with its own narrative conclusion that reflects your choices and achievements.
 
-### The Unification Ending
+### Performance-Based Endings
+
+The game features dynamic endings based on your performance:
+
+#### The Supreme Architect Ending (Victory)
+If you reach level 10, establish businesses in nearly all universes, and accumulate at least 5,000 Quantum Credits, you'll unlock the true victory ending. You become the Supreme Architect of the Multiverse with the power to reshape reality itself, as the Quantum Corporation evolves into the Nexus Corporation under your leadership.
+
+```
+The Quantum Stabilization Matrix is now operating at 100% efficiency
+across all monitored universes. The fractures that once threatened
+to collapse our multiverse have not only been sealed but have been
+transformed into something altogether new.
+
+Our scientists have detected what we're calling the 'Nexus Event' - 
+a fundamental restructuring of the multiversal fabric. Your business
+network has created a self-reinforcing quantum lattice that has 
+essentially 'upgraded' the multiverse itself.
+```
+
+#### The Dimensional Resonance Ending (Legendary Success)
+For players who excel exceptionally (3,000+ Quantum Credits, 15+ businesses across 5+ universes), you'll achieve a special ending where you become the Interdimensional Ambassador with the ability to freely travel between universes through a controlled network of portals.
+
+#### The Quantum Bridge Ending (Great Success)
+If you perform very well (1,000+ Quantum Credits, 10+ businesses across 3+ universes), you'll be promoted to Director of Multiverse Operations as the Quantum Corporation successfully stabilizes the multiverse through your efforts.
+
+#### The Stabilization Project Ending (Moderate Success)
+With moderate success (500+ Quantum Credits or 5+ businesses), your contributions still help slow the degradation of the multiverse fabric, buying time for scientists to develop more effective technology.
+
+#### The Quantum Reset Ending (High Risk)
+If your detection levels rise too high across multiple universes, the Quantum Corporation must initiate emergency extraction procedures and attempt a dimensional reset to prevent multiverse collapse.
+
+#### The Nexus Collapse Ending (Failure)
+If you fail to establish a sufficient business network or accumulate enough quantum credits, the multiverse begins to collapse into a singular timeline as the Quantum Corporation struggles to preserve what little they can.
+
+### Decision-Based Endings
+
+When you reach the endgame by establishing businesses in all universes and accumulating enough Quantum Credits, you'll also face the final decision with three possible outcomes:
+
+#### The Unification Path
 Choose to join the Board and help create a single unified reality under your control. This ending rewards players with ultimate power but at a great moral cost.
 
-### The Stabilization Ending
+#### The Stabilization Path
 Choose to use your business network to permanently stabilize the multiverse, preserving all realities. This is considered the "good" ending and unlocks special achievements.
 
-### The Severance Ending
+#### The Severance Path
 Choose to destroy the Quantum Nexus technology, cutting all connections between universes. This ending is bittersweet - you save all realities from potential exploitation but can no longer travel between them.
 
-Each ending features a unique epilogue that shows the consequences of your choice on each universe you've visited throughout the game.
+Each ending features a unique epilogue that shows the consequences of your choices on each universe you've visited throughout the game, providing deep narrative satisfaction and replay value.
 
 ## Future Plans
 

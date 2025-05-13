@@ -50,6 +50,42 @@ forcing a permanent retreat from that reality.
 The fate of all realities rests in your hands. Good luck, Tycoon.
 ```
 
+## The Final Chapter
+
+As you establish successful businesses across all six universes and accumulate significant quantum wealth, you'll eventually unlock the final chapter of your interdimensional journey.
+
+```
+=== THE QUANTUM CORPORATION ===
+URGENT TRANSMISSION
+FROM: Dr. Eleanor Quantum, Founder & CEO
+TO: Master Operative [Your Name]
+
+Your extraordinary success across the multiverse has provided us with 
+the quantum resources needed to complete our stabilization technology.
+
+However, our research has revealed a disturbing truth: The Quantum Corporation
+is not what it appears to be. The destabilization of the multiverse was not
+a natural phenomenon but orchestrated by forces within our organization.
+
+A rogue faction, led by our Board of Directors, planned to collapse all
+realities into one they could control completely. Your business empire has
+unwittingly been the instrument of their plan.
+
+Now you stand at a crossroads. With your vast network and accumulated power,
+you must make the ultimate choice:
+
+1. Join the Board and rule over a singular, unified reality
+2. Use your quantum network to permanently stabilize the multiverse,
+   preserving the unique integrity of each universe
+3. Destroy the Quantum Nexus technology entirely, severing all connections
+   between universes forever
+
+Whatever you decide will permanently alter the fate of countless realities.
+The multiverse awaits your decision, Tycoon.
+```
+
+Your final decision will determine one of three distinct endings, each with different consequences for the multiverse and rewards for your character.
+
 ## Game Concept
 
 In Multiverse Tycoon, you play as a business operator with access to interdimensional travel technology. Your mission is to build a profitable business empire that spans across different fictional universes while avoiding detection by universe authorities. Each universe offers unique opportunities and challenges:
@@ -558,6 +594,21 @@ If you encounter any issues:
 3. Verify that the game files are not corrupted
 4. Check that you have read/write permissions in the game directory (for save files)
 
+## Game Endings
+
+When you reach the endgame by establishing businesses in all universes and accumulating enough Quantum Credits, you'll face the final decision with three possible outcomes:
+
+### The Unification Ending
+Choose to join the Board and help create a single unified reality under your control. This ending rewards players with ultimate power but at a great moral cost.
+
+### The Stabilization Ending
+Choose to use your business network to permanently stabilize the multiverse, preserving all realities. This is considered the "good" ending and unlocks special achievements.
+
+### The Severance Ending
+Choose to destroy the Quantum Nexus technology, cutting all connections between universes. This ending is bittersweet - you save all realities from potential exploitation but can no longer travel between them.
+
+Each ending features a unique epilogue that shows the consequences of your choice on each universe you've visited throughout the game.
+
 ## Future Plans
 
 Future updates may include:
@@ -566,5 +617,6 @@ Future updates may include:
 - Corporate espionage mechanics
 - Custom business naming and customization
 - Extended narrative arcs in each universe
+- Additional alternate endings based on player choices
 
 Enjoy your interdimensional business adventures in Multiverse Tycoon!

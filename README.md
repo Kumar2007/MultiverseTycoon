@@ -508,6 +508,86 @@ When you push to GitHub, automated workflows run to:
 5. After approval, tag the release
 6. Automated workflows build and publish release packages
 
+## Installation and Download
+
+### How to Download and Install
+
+To download and play Multiverse Tycoon, follow these steps:
+
+#### Option 1: Download the Release Package (Recommended for players)
+
+1. Go to the [Releases page](https://github.com/yourusername/multiverse-tycoon/releases) on GitHub
+2. Download the appropriate zip file for your operating system:
+   - `MultiVerseTycoon_Windows.zip` for Windows
+   - `MultiVerseTycoon_MacOS.zip` for macOS
+   - `MultiVerseTycoon_Linux.zip` for Linux
+3. Extract the zip file to a folder of your choice
+
+#### Option 2: Clone the Repository (For developers or contributors)
+
+```bash
+git clone https://github.com/yourusername/multiverse-tycoon.git
+cd multiverse-tycoon
+```
+
+### How to Play
+
+#### Requirements
+- Python 3.6 or higher must be installed on your system
+  - [Download Python](https://www.python.org/downloads/)
+
+#### Running the Game
+
+**For Release Package Users:**
+
+Windows:
+1. Navigate to the extracted folder
+2. Double-click on `run_game.bat` or open Command Prompt and run:
+   ```
+   python multiverse_tycoon.py
+   ```
+
+macOS/Linux:
+1. Open Terminal in the extracted folder
+2. Make the shell script executable (first time only):
+   ```
+   chmod +x run_game.sh
+   ```
+3. Run the game:
+   ```
+   ./run_game.sh
+   ```
+   or
+   ```
+   python3 multiverse_tycoon.py
+   ```
+
+**For Repository Users:**
+1. Navigate to the cloned repository folder
+2. Run the game:
+   ```
+   python multiverse_tycoon.py
+   ```
+
+#### Game Controls
+
+The game is controlled through the terminal interface:
+- Follow the on-screen prompts
+- Enter the number corresponding to your chosen action
+- Type 'q' or 'quit' at most menus to exit
+
+#### Save Files
+
+Your game progress is automatically saved in the same directory as the executable. Save files are named `multiverse_tycoon_[PLAYERNAME].json`.
+
+#### Troubleshooting
+
+If you encounter any issues:
+1. Make sure Python 3.6+ is installed and in your system PATH
+2. Try running the game from the terminal/command prompt to see any error messages
+3. Verify that the game files are not corrupted
+4. Check that you have read/write permissions in the game directory (for save files)
+
 ## Future Plans
 
 Future updates may include:

@@ -532,38 +532,12 @@ cd multiverse-tycoon
 - Python 3.6 or higher must be installed on your system
   - [Download Python](https://www.python.org/downloads/)
 
-#### Running the Game
+#### Starting the Game
 
-**For Release Package Users:**
-
-Windows:
 1. Navigate to the extracted folder
-2. Double-click on `run_game.bat` or open Command Prompt and run:
-   ```
-   python multiverse_tycoon.py
-   ```
-
-macOS/Linux:
-1. Open Terminal in the extracted folder
-2. Make the shell script executable (first time only):
-   ```
-   chmod +x run_game.sh
-   ```
-3. Run the game:
-   ```
-   ./run_game.sh
-   ```
-   or
-   ```
-   python3 multiverse_tycoon.py
-   ```
-
-**For Repository Users:**
-1. Navigate to the cloned repository folder
-2. Run the game:
-   ```
-   python multiverse_tycoon.py
-   ```
+2. Run the game using one of these methods:
+   - Windows: Double-click on `run_game.bat` or run `python multiverse_tycoon.py`
+   - macOS/Linux: Run `./run_game.sh` or `python3 multiverse_tycoon.py`
 
 #### Game Controls
 

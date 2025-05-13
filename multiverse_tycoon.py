@@ -2770,8 +2770,8 @@ class MultiVerseTycoon:
         print(f"Local Currency: {player_universe_data['cash']} {universe['currency']}")
         print(f"Quantum Credits: {self.player['quantum_credits']} Q¢")
         
-        # Get all mini games
-        all_games = self.mini_game_system.get_all_games()
+        # Get all mini games with universe-specific theming
+        all_games = self.mini_game_system.get_all_games(universe_id)
         games_list = list(all_games.items())
         
         # Display available mini games
@@ -2843,8 +2843,8 @@ class MultiVerseTycoon:
         universe = self.universes[universe_id]
         player_universe_data = self.player["universes"][universe_id]
         
-        # Play the game
-        success = self.mini_game_system.play_game(game_id, difficulty)
+        # Play the game with universe-specific theming
+        success = self.mini_game_system.play_game(game_id, difficulty, universe_id)
         
         # Update player stats
         self.player["mini_games_played"] += 1

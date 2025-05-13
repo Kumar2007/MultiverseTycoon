@@ -10,11 +10,11 @@ class MiniGameSystem:
     
     def __init__(self):
         """Initialize the mini game system."""
-        # Define the mini games and their rewards
+        # Define the mini games with base settings
         self.mini_games = {
             "number_guess": {
-                "name": "Number Guessing Game",
-                "description": "Guess a number between 1 and 100.",
+                "name": "Number Prediction System",
+                "base_description": "Predict a number within a specific range.",
                 "difficulty": "Easy",
                 "rewards": {
                     "easy": {"local_currency": 500, "quantum_credits": 5, "reputation": 1},
@@ -23,8 +23,8 @@ class MiniGameSystem:
                 }
             },
             "code_breaker": {
-                "name": "Code Breaker",
-                "description": "Break a secret code by guessing the correct sequence of numbers.",
+                "name": "Security Bypass Protocol",
+                "base_description": "Break a secret code by determining the correct sequence.",
                 "difficulty": "Medium",
                 "rewards": {
                     "easy": {"local_currency": 800, "quantum_credits": 8, "reputation": 2},
@@ -33,8 +33,8 @@ class MiniGameSystem:
                 }
             },
             "word_unscramble": {
-                "name": "Word Unscrambler",
-                "description": "Unscramble jumbled words related to multiverse business.",
+                "name": "Language Decryption Matrix",
+                "base_description": "Unscramble jumbled words from various realities.",
                 "difficulty": "Medium",
                 "rewards": {
                     "easy": {"local_currency": 700, "quantum_credits": 7, "reputation": 2},
@@ -43,8 +43,8 @@ class MiniGameSystem:
                 }
             },
             "reaction_test": {
-                "name": "Reaction Time Test",
-                "description": "Test your reflexes by pressing Enter exactly when prompted.",
+                "name": "Temporal Reflex Calibrator",
+                "base_description": "Test your quantum reflexes with split-second timing.",
                 "difficulty": "Easy",
                 "rewards": {
                     "easy": {"local_currency": 600, "quantum_credits": 6, "reputation": 1},
@@ -53,8 +53,8 @@ class MiniGameSystem:
                 }
             },
             "memory_match": {
-                "name": "Memory Match",
-                "description": "Remember a sequence of symbols and repeat it back.",
+                "name": "Neural Pattern Recognition",
+                "base_description": "Memorize and reproduce interdimensional patterns.",
                 "difficulty": "Hard",
                 "rewards": {
                     "easy": {"local_currency": 1000, "quantum_credits": 10, "reputation": 3},
@@ -64,7 +64,170 @@ class MiniGameSystem:
             }
         }
         
-        # Word list for Word Unscrambler game
+        # Universe-specific game themes and descriptions
+        self.universe_themes = {
+            "blade_runner": {
+                "name_prefix": "Replicant ",
+                "game_descriptions": {
+                    "number_guess": "Predict replicant identification numbers to bypass Tyrell security protocols.",
+                    "code_breaker": "Hack into Tyrell Corporation's systems by breaking encoded security sequences.",
+                    "word_unscramble": "Decipher scrambled memory fragments from replicant mind implants.",
+                    "reaction_test": "Test your reflexes to evade Blade Runner detection systems.",
+                    "memory_match": "Match pattern sequences to implant new memories into replicants."
+                },
+                "symbols": ['👁️', '⚡', '🔍', '🧠', '🦾', '🏙️', '🌧️', '🔫', '📊', '🚔']
+            },
+            "gta_v": {
+                "name_prefix": "Los Santos ",
+                "game_descriptions": {
+                    "number_guess": "Crack safe combinations in high-stakes Los Santos heists.",
+                    "code_breaker": "Bypass police security systems by decoding encrypted communications.",
+                    "word_unscramble": "Decode scrambled messages from crime syndicate contacts.",
+                    "reaction_test": "Test your getaway driving reflexes in high-speed police pursuits.",
+                    "memory_match": "Memorize patrol patterns to plan the perfect heist escape route."
+                },
+                "symbols": ['💰', '🚗', '🚁', '💣', '🔫', '🏢', '🏖️', '🚔', '💎', '🚀']
+            },
+            "mcu": {
+                "name_prefix": "Avengers ",
+                "game_descriptions": {
+                    "number_guess": "Calculate quantum realm coordinates for precise interdimensional travel.",
+                    "code_breaker": "Decrypt S.H.I.E.L.D. intelligence by breaking their security codes.",
+                    "word_unscramble": "Decipher Asgardian runes and alien language fragments.",
+                    "reaction_test": "Test your superhero reflexes against Quicksilver's movements.",
+                    "memory_match": "Match Infinity Stone energy signatures for secure containment."
+                },
+                "symbols": ['🛡️', '⚡', '👊', '💫', '🔨', '🕸️', '🧠', '🚀', '💎', '🔮']
+            },
+            "doraemon": {
+                "name_prefix": "Gadget ",
+                "game_descriptions": {
+                    "number_guess": "Predict which pocket dimension contains Doraemon's secret gadgets.",
+                    "code_breaker": "Decode time travel coordinates to access different eras.",
+                    "word_unscramble": "Unscramble the names of futuristic gadgets from the 22nd century.",
+                    "reaction_test": "Test your reflexes to catch malfunctioning gadgets before they cause chaos.",
+                    "memory_match": "Memorize the correct sequence of buttons to activate complex future tech."
+                },
+                "symbols": ['🚪', '⏱️', '🐱', '🔮', '🚀', '🍩', '🎁', '🤖', '✨', '🔍']
+            },
+            "wizarding_world": {
+                "name_prefix": "Magical ",
+                "game_descriptions": {
+                    "number_guess": "Predict the correct combination for magical vault access at Gringotts.",
+                    "code_breaker": "Break enchanted codes to access restricted sections of ancient grimoires.",
+                    "word_unscramble": "Unscramble powerful spell incantations and potion ingredients.",
+                    "reaction_test": "Test your wizarding reflexes in magical duels against dark wizards.",
+                    "memory_match": "Match magical creature patterns to identify rare species."
+                },
+                "symbols": ['⚡', '🧙', '🔮', '🧪', '🦉', '📜', '🐉', '🧹', '✨', '⚗️']
+            },
+            "dark": {
+                "name_prefix": "Winden ",
+                "game_descriptions": {
+                    "number_guess": "Calculate precise dates in the 33-year cycle to navigate time travel.",
+                    "code_breaker": "Decode the secrets of the cave system by breaking temporal lock codes.",
+                    "word_unscramble": "Unscramble paradoxical family connections in Winden's timeline.",
+                    "reaction_test": "Test your timing to activate the God Particle at the exact moment.",
+                    "memory_match": "Match cause and effect patterns across multiple timelines."
+                },
+                "symbols": ['⏳', '☢️', '🌑', '🌧️', '⚰️', '⌛', '🕯️', '🌲', '🔍', '🚪']
+            }
+        }
+        
+        # Universe-specific word lists for Word Unscrambler game
+        self.universe_word_lists = {
+            "blade_runner": {
+                "easy": [
+                    "replicant", "android", "tyrell", "memory", "blade",
+                    "runner", "implant", "nexus", "urban", "neon"
+                ],
+                "medium": [
+                    "voight-kampff", "offworld", "corporation", "synthetic", "dystopian",
+                    "retirement", "bioengineered", "interrogation", "baseline", "implanted"
+                ],
+                "hard": [
+                    "more human than human", "tears in rain", "incept date", "tanhauser gate",
+                    "combat model", "memory implantation", "emotional response", "empathy test",
+                    "rachel is a replicant", "attack ships on fire"
+                ]
+            },
+            "gta_v": {
+                "easy": [
+                    "heist", "money", "crime", "police", "chase",
+                    "robbery", "gang", "weapons", "cars", "drugs"
+                ],
+                "medium": [
+                    "los santos", "trevor", "michael", "franklin", "criminal",
+                    "lester", "vehicle", "nightclub", "ammunition", "launder"
+                ],
+                "hard": [
+                    "five star wanted", "pacific standard", "humane labs", "merryweather", "military base",
+                    "diamond casino", "doomsday heist", "agency deal", "yacht mission", "underground bunker"
+                ]
+            },
+            "mcu": {
+                "easy": [
+                    "avenger", "shield", "stark", "hulk", "thor",
+                    "hydra", "marvel", "power", "hero", "thanos"
+                ],
+                "medium": [
+                    "infinity stone", "wakanda", "vibranium", "multiverse", "quantum realm",
+                    "asgardian", "kree empire", "chitauri", "tesseract", "super soldier"
+                ],
+                "hard": [
+                    "battle of new york", "infinity gauntlet", "celestial beings", "doctor strange",
+                    "captain america", "guardians of galaxy", "black order", "scarlet witch",
+                    "multiverse of madness", "secret invasion"
+                ]
+            },
+            "doraemon": {
+                "easy": [
+                    "gadget", "nobita", "future", "pocket", "time",
+                    "doraemon", "robot", "machine", "japan", "friend"
+                ],
+                "medium": [
+                    "anywhere door", "time machine", "bamboo copter", "small light", "big light",
+                    "translation jelly", "memory bread", "future catalog", "reality mirror", "takecopter"
+                ],
+                "hard": [
+                    "fourth dimensional pocket", "time paradox prevention", "twenty second century",
+                    "gadget malfunction", "nobita descendants", "reality alteration device",
+                    "interdimensional travel", "emotional programming", "temporal displacement", "future prediction"
+                ]
+            },
+            "wizarding_world": {
+                "easy": [
+                    "magic", "wand", "spell", "potion", "wizard",
+                    "witch", "dragon", "hogwarts", "muggle", "owl"
+                ],
+                "medium": [
+                    "expelliarmus", "patronus", "leviosa", "animagus", "horcrux",
+                    "gryffindor", "slytherin", "azkaban", "pensieve", "occlumency"
+                ],
+                "hard": [
+                    "expecto patronum", "wingardium leviosa", "avada kedavra", "sectumsempra",
+                    "chamber of secrets", "deathly hallows", "polyjuice potion", "unbreakable vow",
+                    "ministry of magic", "order of the phoenix"
+                ]
+            },
+            "dark": {
+                "easy": [
+                    "time", "travel", "winden", "cave", "nuclear",
+                    "cycle", "sic", "mundus", "loop", "past"
+                ],
+                "medium": [
+                    "god particle", "time loop", "thirty three", "adam and eva", "temporal knot",
+                    "bootstrap paradox", "travelers", "sic mundus", "causality", "determinism"
+                ],
+                "hard": [
+                    "the beginning is the end", "dark matter bubble", "casual deterministic loop",
+                    "bootstrap paradox", "quantum entanglement", "temporal displacement",
+                    "apocalypse prevention", "triquetra connection", "nielsen family tree", "reality fragmentation"
+                ]
+            }
+        }
+        
+        # Default generic word list as fallback
         self.word_lists = {
             "easy": [
                 "business", "money", "profit", "trade", "sell", 
@@ -80,30 +243,81 @@ class MiniGameSystem:
             ]
         }
         
-        # Symbols for Memory Match game
+        # Default symbols for Memory Match game (fallback)
         self.symbols = ['!', '@', '#', '$', '%', '^', '&', '*', '+', '-']
         
     def clear_screen(self):
         """Clear the terminal screen."""
         os.system('cls' if os.name == 'nt' else 'clear')
         
-    def get_all_games(self):
-        """Return all available mini games."""
-        return self.mini_games
+    def get_all_games(self, universe_id=None):
+        """
+        Return all available mini games, themed to the current universe if provided.
+        
+        Args:
+            universe_id (str, optional): The current universe ID. If provided,
+                                       games will be themed to this universe.
+        
+        Returns:
+            dict: Dictionary of themed mini games.
+        """
+        if not universe_id or universe_id not in self.universe_themes:
+            # Return generic games if no universe specified or if it's not in our themes
+            return self.mini_games
+            
+        # Create a copy of the mini games with universe-specific theming
+        themed_games = {}
+        universe_theme = self.universe_themes[universe_id]
+        
+        for game_id, game_info in self.mini_games.items():
+            # Create a deep copy of the game info
+            themed_game = game_info.copy()
+            
+            # Apply universe-specific name prefix
+            themed_game["name"] = universe_theme["name_prefix"] + game_info["name"]
+            
+            # Apply universe-specific description if available
+            if game_id in universe_theme["game_descriptions"]:
+                themed_game["description"] = universe_theme["game_descriptions"][game_id]
+            else:
+                themed_game["description"] = game_info["base_description"]
+                
+            themed_games[game_id] = themed_game
+            
+        return themed_games
     
-    def play_number_guess(self, difficulty):
+    def play_number_guess(self, difficulty, universe_id=None):
         """
         Play the number guessing game.
         
         The player has to guess a random number within a range.
+        Game is themed to match the current universe if provided.
+        
         - Easy: 1-50, 7 guesses
         - Medium: 1-100, 7 guesses
         - Hard: 1-200, 8 guesses
         
-        Returns True if the player wins, False otherwise.
+        Args:
+            difficulty (str): The difficulty level ('easy', 'medium', or 'hard')
+            universe_id (str, optional): The current universe ID for themed content
+            
+        Returns:
+            bool: True if the player wins, False otherwise.
         """
         self.clear_screen()
-        print("\n=== Number Guessing Game ===")
+        
+        # Get universe-specific title and description if available
+        title = "Number Guessing Game"
+        description = "I'm thinking of a number between 1 and {max_number}."
+        
+        if universe_id and universe_id in self.universe_themes:
+            universe_theme = self.universe_themes[universe_id]
+            title = universe_theme["name_prefix"] + "Number Prediction System"
+            
+            if "number_guess" in universe_theme["game_descriptions"]:
+                description = universe_theme["game_descriptions"]["number_guess"]
+        
+        print(f"\n=== {title} ===")
         
         # Set difficulty parameters
         if difficulty == "easy":
@@ -119,7 +333,9 @@ class MiniGameSystem:
         target_number = random.randint(1, max_number)
         guesses_left = max_guesses
         
-        print(f"I'm thinking of a number between 1 and {max_number}.")
+        # Format the description by replacing {max_number} with the actual max_number
+        formatted_description = description.replace("{max_number}", str(max_number))
+        print(formatted_description)
         print(f"You have {guesses_left} guesses to find it.")
         
         while guesses_left > 0:
@@ -146,22 +362,40 @@ class MiniGameSystem:
         print(f"\nGame over! The number was {target_number}.")
         return False
     
-    def play_code_breaker(self, difficulty):
+    def play_code_breaker(self, difficulty, universe_id=None):
         """
         Play the code breaker game.
         
         The player has to guess a sequence of numbers.
         After each guess, feedback is given on how many numbers are correct
         and how many are in the correct position.
+        Game is themed to match the current universe if provided.
         
         - Easy: 3 digits (1-6), 8 guesses
         - Medium: 4 digits (1-6), 10 guesses
         - Hard: 5 digits (1-8), 12 guesses
         
-        Returns True if the player wins, False otherwise.
+        Args:
+            difficulty (str): The difficulty level ('easy', 'medium', or 'hard')
+            universe_id (str, optional): The current universe ID for themed content
+            
+        Returns:
+            bool: True if the player wins, False otherwise.
         """
         self.clear_screen()
-        print("\n=== Code Breaker ===")
+        
+        # Get universe-specific title and description if available
+        title = "Code Breaker"
+        description = "Break a secret code by guessing the correct sequence of numbers."
+        
+        if universe_id and universe_id in self.universe_themes:
+            universe_theme = self.universe_themes[universe_id]
+            title = universe_theme["name_prefix"] + "Security Bypass Protocol"
+            
+            if "code_breaker" in universe_theme["game_descriptions"]:
+                description = universe_theme["game_descriptions"]["code_breaker"]
+        
+        print(f"\n=== {title} ===")
         
         # Set difficulty parameters
         if difficulty == "easy":
@@ -181,6 +415,7 @@ class MiniGameSystem:
         secret_code = [random.randint(1, number_range) for _ in range(code_length)]
         guesses_left = max_guesses
         
+        print(description)
         print(f"I've created a code with {code_length} digits (1-{number_range}).")
         print(f"You have {guesses_left} attempts to crack it.")
         print("After each guess, you'll get feedback:")
@@ -242,40 +477,62 @@ class MiniGameSystem:
         print(f"\nGame over! The code was: {' '.join(map(str, secret_code))}")
         return False
     
-    def play_word_unscramble(self, difficulty):
+    def play_word_unscramble(self, difficulty, universe_id=None):
         """
         Play the word unscrambler game.
         
         The player is presented with scrambled words and has to unscramble them.
+        Words are themed to the current universe if provided.
         
         - Easy: 5 words, 30 seconds per word
         - Medium: 6 words, 25 seconds per word
         - Hard: 8 words, 20 seconds per word
         
-        Returns True if the player unscrambles at least 70% of the words, False otherwise.
+        Args:
+            difficulty (str): The difficulty level ('easy', 'medium', or 'hard')
+            universe_id (str, optional): The current universe ID for themed content
+            
+        Returns:
+            bool: True if the player unscrambles at least 70% of the words, False otherwise.
         """
         self.clear_screen()
-        print("\n=== Word Unscrambler ===")
+        
+        # Get universe-specific title and description if available
+        title = "Word Unscrambler"
+        description = "Unscramble the following words related to multiverse business."
+        
+        if universe_id and universe_id in self.universe_themes:
+            universe_theme = self.universe_themes[universe_id]
+            title = universe_theme["name_prefix"] + "Language Decryption Matrix"
+            
+            if "word_unscramble" in universe_theme["game_descriptions"]:
+                description = universe_theme["game_descriptions"]["word_unscramble"]
+        
+        print(f"\n=== {title} ===")
         
         # Set difficulty parameters
         if difficulty == "easy":
             num_words = 5
             time_per_word = 30
-            word_list = self.word_lists["easy"]
         elif difficulty == "medium":
             num_words = 6
             time_per_word = 25
-            word_list = self.word_lists["medium"]
         else:  # hard
             num_words = 8
             time_per_word = 20
-            word_list = self.word_lists["hard"]
+        
+        # Get the appropriate word list based on universe and difficulty
+        if universe_id and universe_id in self.universe_word_lists:
+            word_list = self.universe_word_lists[universe_id][difficulty]
+        else:
+            word_list = self.word_lists[difficulty]
             
-        # Select random words
+        # Select random words (ensure we don't try to sample more words than available)
+        num_words = min(num_words, len(word_list))
         selected_words = random.sample(word_list, num_words)
         correct_count = 0
         
-        print("Unscramble the following words related to multiverse business.")
+        print(description)
         print(f"You have {time_per_word} seconds per word.")
         print("Type 'skip' to skip a word.")
         input("\nPress Enter to start...")
@@ -329,20 +586,38 @@ class MiniGameSystem:
             print(f"You needed to unscramble at least {int(threshold * 100)}% of the words to succeed.")
             return False
     
-    def play_reaction_test(self, difficulty):
+    def play_reaction_test(self, difficulty, universe_id=None):
         """
         Play the reaction time test game.
         
         The player has to press Enter exactly when prompted after a random delay.
+        Test is themed to match the current universe if provided.
         
         - Easy: 5 rounds, 3 second maximum delay, 0.3s error margin
         - Medium: 7 rounds, 4 second maximum delay, 0.2s error margin
         - Hard: 10 rounds, 5 second maximum delay, 0.1s error margin
         
-        Returns True if the player succeeds in at least 70% of rounds, False otherwise.
+        Args:
+            difficulty (str): The difficulty level ('easy', 'medium', or 'hard')
+            universe_id (str, optional): The current universe ID for themed content
+            
+        Returns:
+            bool: True if the player succeeds in at least 70% of rounds, False otherwise.
         """
         self.clear_screen()
-        print("\n=== Reaction Time Test ===")
+        
+        # Get universe-specific title and description if available
+        title = "Reaction Time Test"
+        description = "Test your reflexes! Press Enter exactly when you see 'NOW!'"
+        
+        if universe_id and universe_id in self.universe_themes:
+            universe_theme = self.universe_themes[universe_id]
+            title = universe_theme["name_prefix"] + "Temporal Reflex Calibrator"
+            
+            if "reaction_test" in universe_theme["game_descriptions"]:
+                description = universe_theme["game_descriptions"]["reaction_test"]
+        
+        print(f"\n=== {title} ===")
         
         # Set difficulty parameters
         if difficulty == "easy":
@@ -360,7 +635,7 @@ class MiniGameSystem:
             
         successful_rounds = 0
         
-        print("Test your reflexes! Press Enter exactly when you see 'NOW!'")
+        print(description)
         print(f"You'll have {error_margin} seconds margin of error.")
         print(f"Get ready for {num_rounds} rounds!")
         input("\nPress Enter to start...")
@@ -409,20 +684,38 @@ class MiniGameSystem:
             print(f"You needed to succeed in at least {int(threshold * 100)}% of the rounds.")
             return False
     
-    def play_memory_match(self, difficulty):
+    def play_memory_match(self, difficulty, universe_id=None):
         """
         Play the memory match game.
         
         The player is shown a sequence of symbols and has to repeat it from memory.
+        Symbols are themed to the current universe if provided.
         
         - Easy: Start with 3 symbols, up to 7
         - Medium: Start with 4 symbols, up to 9
         - Hard: Start with 5 symbols, up to 12
         
-        Returns True if the player reaches at least the minimum threshold, False otherwise.
+        Args:
+            difficulty (str): The difficulty level ('easy', 'medium', or 'hard')
+            universe_id (str, optional): The current universe ID for themed content
+            
+        Returns:
+            bool: True if the player reaches at least the minimum threshold, False otherwise.
         """
         self.clear_screen()
-        print("\n=== Memory Match ===")
+        
+        # Get universe-specific title, description and symbols if available
+        title = "Memory Match"
+        description = "Memorize the sequence of symbols and repeat it back."
+        
+        if universe_id and universe_id in self.universe_themes:
+            universe_theme = self.universe_themes[universe_id]
+            title = universe_theme["name_prefix"] + "Neural Pattern Recognition"
+            
+            if "memory_match" in universe_theme["game_descriptions"]:
+                description = universe_theme["game_descriptions"]["memory_match"]
+        
+        print(f"\n=== {title} ===")
         
         # Set difficulty parameters
         if difficulty == "easy":
@@ -441,14 +734,20 @@ class MiniGameSystem:
         current_length = start_length
         success_threshold = max(start_length + 2, int(max_length * 0.7))
         
-        print("Memorize the sequence of symbols and repeat it back!")
+        # Get the universe-specific symbols if available
+        symbols_to_use = self.symbols
+        if universe_id and universe_id in self.universe_themes and "symbols" in self.universe_themes[universe_id]:
+            symbols_to_use = self.universe_themes[universe_id]["symbols"]
+        
+        print(description)
         print(f"Starting with {start_length} symbols, we'll increase the length as you succeed.")
         print(f"You need to reach a sequence of at least {success_threshold} symbols to win.")
+        print(f"Symbols used: {' '.join(symbols_to_use[:10])}")
         input("\nPress Enter to start...")
         
         while current_length <= max_length:
             # Generate a random sequence
-            sequence = random.choices(self.symbols, k=current_length)
+            sequence = random.choices(symbols_to_use, k=current_length)
             
             # Show the sequence
             self.clear_screen()
@@ -493,18 +792,28 @@ class MiniGameSystem:
         print("\nAmazing! You've mastered the maximum sequence length!")
         return True
         
-    def play_game(self, game_id, difficulty):
-        """Play a specific mini game with the given difficulty."""
+    def play_game(self, game_id, difficulty, universe_id=None):
+        """
+        Play a specific mini game with the given difficulty and universe-specific theming.
+        
+        Args:
+            game_id (str): The ID of the game to play
+            difficulty (str): The difficulty level ('easy', 'medium', or 'hard')
+            universe_id (str, optional): The current universe ID for themed content
+            
+        Returns:
+            bool: True if the player wins, False otherwise
+        """
         if game_id == "number_guess":
-            return self.play_number_guess(difficulty)
+            return self.play_number_guess(difficulty, universe_id)
         elif game_id == "code_breaker":
-            return self.play_code_breaker(difficulty)
+            return self.play_code_breaker(difficulty, universe_id)
         elif game_id == "word_unscramble":
-            return self.play_word_unscramble(difficulty)
+            return self.play_word_unscramble(difficulty, universe_id)
         elif game_id == "reaction_test":
-            return self.play_reaction_test(difficulty)
+            return self.play_reaction_test(difficulty, universe_id)
         elif game_id == "memory_match":
-            return self.play_memory_match(difficulty)
+            return self.play_memory_match(difficulty, universe_id)
         else:
             print(f"Unknown game ID: {game_id}")
             return False

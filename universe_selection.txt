@@ -20,6 +20,12 @@
 ║  6. [LOCKED] Dark                                          ║
 ║     Unlocks at Level 6                                     ║
 ║                                                            ║
-║  7. Return to main menu                                    ║
+║  7. [LOCKED] John Wick                                     ║
+║     Unlocks at Level 7                                     ║
+║                                                            ║
+║  8. [LOCKED] Monsterverse                                  ║
+║     Unlocks at Level 8                                     ║
+║                                                            ║
+║  9. Return to main menu                                    ║
 ║                                                            ║
 ╚════════════════════════════════════════════════════════════╝

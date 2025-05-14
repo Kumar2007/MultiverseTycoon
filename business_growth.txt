@@ -32,3 +32,25 @@ MARVEL CINEMATIC UNIVERSE
     Profit: Low                     Profit: Medium                 Profit: High
     Risk: Low                       Risk: Medium                   Risk: High
     Startup: 3,000-6,000            Startup: 15,000-30,000         Startup: 60,000-120,000
+
+JOHN WICK UNIVERSE
+┌─────────────────────┐         ┌─────────────────────┐         ┌─────────────────────┐
+│  Tier 1             │         │  Tier 2             │         │  Tier 3             │
+│  Tailor Shop        │  ──►    │  Gun Shop          │  ──►    │  Continental Hotel  │
+│  Dog Shelter        │         │  Training Facility  │         │  High Table Bank    │
+│  Coin Exchange      │         │  Armory            │         │  Assassin Network   │
+└─────────────────────┘         └─────────────────────┘         └─────────────────────┘
+    Profit: Low                     Profit: Medium                 Profit: High
+    Risk: Low                       Risk: Medium                   Risk: High
+    Startup: 2,500-5,500            Startup: 12,000-28,000         Startup: 55,000-110,000
+
+MONSTERVERSE UNIVERSE
+┌─────────────────────┐         ┌─────────────────────┐         ┌─────────────────────┐
+│  Tier 1             │         │  Tier 2             │         │  Tier 3             │
+│  Bunker Systems     │  ──►    │  Monarch Outpost    │  ──►    │  Titan Research    │
+│  Evacuation Service │         │  Defense Contracts  │         │  Bio-Weapon Lab     │
+│  Radiation Shields  │         │  Kaiju Tourism      │         │  Orca Technology    │
+└─────────────────────┘         └─────────────────────┘         └─────────────────────┘
+    Profit: Low                     Profit: Medium                 Profit: High
+    Risk: Low                       Risk: Medium                   Risk: High
+    Startup: 4,000-8,000            Startup: 18,000-35,000         Startup: 70,000-140,000

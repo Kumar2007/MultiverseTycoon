@@ -108,3 +108,182 @@ def delete_save_files():
             print("\nInvalid input.")
     
     input("\nPress Enter to continue...")
+
+def generate_reward_codes():
+    """Generate reward codes for testing."""
+    clear_screen()
+    print_header("GENERATE REWARD CODES")
+    
+    # Check if ad codes file exists
+    if not os.path.exists("saves/ad_codes.json"):
+        print("\nAd codes file not found. Creating a new one.")
+        
+        try:
+            # Ensure the saves directory exists
+            if not os.path.exists("saves"):
+                os.makedirs("saves")
+                
+            # Create an empty ad codes file
+            with open("saves/ad_codes.json", "w") as file:
+                json.dump({"codes": {}, "generated_time": 0}, file)
+                
+        except Exception as e:
+            print(f"\nError creating ad codes file: {e}")
+            input("\nPress Enter to continue...")
+            return
+    
+    # Load the ad codes
+    try:
+        with open("saves/ad_codes.json", "r") as file:
+            ad_codes = json.load(file)
+    except Exception as e:
+        print(f"\nError loading ad codes: {e}")
+        input("\nPress Enter to continue...")
+        return
+    
+    # Generate 5 new codes
+    import string
+    import time
+    from datetime import datetime, timedelta
+    
+    current_time = time.time()
+    
+    # Generate some codes without overwriting existing ones
+    new_codes = {}
+    
+    for i in range(5):
+        code = 'MVT-' + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+        
+        # Pick a random reward type
+        reward_types = ["small_quantum", "medium_quantum", "large_quantum", "cash_boost", "safety_net"]
+        reward_type = random.choice(reward_types)
+        
+        # Set expiry to 7 days from now
+        expiry_time = current_time + (7 * 24 * 60 * 60)
+        
+        new_codes[code] = {
+            "reward_type": reward_type,
+            "claimed": False,
+            "expiry_time": expiry_time
+        }
+        
+        # Display the new code
+        expiry_date = datetime.fromtimestamp(expiry_time).strftime("%Y-%m-%d")
+        print(f"\nGenerated code: {code}")
+        print(f"Reward type: {reward_type}")
+        print(f"Expires: {expiry_date}")
+    
+    # Update the codes file
+    ad_codes["codes"].update(new_codes)
+    ad_codes["generated_time"] = current_time
+    
+    try:
+        with open("saves/ad_codes.json", "w") as file:
+            json.dump(ad_codes, file)
+        print("\nCodes generated and saved successfully.")
+    except Exception as e:
+        print(f"\nError saving ad codes: {e}")
+    
+    input("\nPress Enter to continue...")
+
+def reset_active_rewards():
+    """Reset all active rewards."""
+    clear_screen()
+    print_header("RESET ACTIVE REWARDS")
+    
+    # Check if active rewards file exists
+    if not os.path.exists("saves/active_rewards.json"):
+        print("\nActive rewards file not found. Nothing to reset.")
+        input("\nPress Enter to continue...")
+        return
+    
+    try:
+        # Reset the active rewards
+        with open("saves/active_rewards.json", "w") as file:
+            empty_rewards = {"active_boosts": [], "redeemed_codes": [], "last_ad_time": 0}
+            json.dump(empty_rewards, file)
+        
+        print("\nActive rewards have been reset successfully.")
+    except Exception as e:
+        print(f"\nError resetting active rewards: {e}")
+    
+    input("\nPress Enter to continue...")
+
+def list_active_rewards():
+    """List all active rewards."""
+    clear_screen()
+    print_header("ACTIVE REWARDS")
+    
+    # Check if active rewards file exists
+    if not os.path.exists("saves/active_rewards.json"):
+        print("\nActive rewards file not found.")
+        input("\nPress Enter to continue...")
+        return
+    
+    try:
+        # Load the active rewards
+        with open("saves/active_rewards.json", "r") as file:
+            active_rewards = json.load(file)
+        
+        # Display active boosts
+        if active_rewards.get("active_boosts"):
+            print("\nActive Boosts:")
+            for boost in active_rewards["active_boosts"]:
+                print(f"• {boost.get('name', 'Unknown')} - {boost.get('turns_remaining', 0)} turns remaining")
+        else:
+            print("\nNo active boosts.")
+        
+        # Display redeemed codes
+        if active_rewards.get("redeemed_codes"):
+            print("\nRedeemed Codes:")
+            for code in active_rewards["redeemed_codes"]:
+                print(f"• {code}")
+        else:
+            print("\nNo redeemed codes.")
+        
+        # Display last ad time
+        last_ad_time = active_rewards.get("last_ad_time", 0)
+        if last_ad_time > 0:
+            from datetime import datetime
+            last_time = datetime.fromtimestamp(last_ad_time)
+            print(f"\nLast ad watched at: {last_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        else:
+            print("\nNo ads watched yet.")
+        
+    except Exception as e:
+        print(f"\nError loading active rewards: {e}")
+    
+    input("\nPress Enter to continue...")
+
+def reset_ad_cooldown():
+    """Reset the ad watch cooldown."""
+    clear_screen()
+    print_header("RESET AD WATCH COOLDOWN")
+    
+    # Check if active rewards file exists
+    if not os.path.exists("saves/active_rewards.json"):
+        print("\nActive rewards file not found.")
+        input("\nPress Enter to continue...")
+        return
+    
+    try:
+        # Load the active rewards
+        with open("saves/active_rewards.json", "r") as file:
+            active_rewards = json.load(file)
+        
+        # Reset the ad watch cooldown
+        active_rewards["last_ad_time"] = 0
+        
+        # Save the updated active rewards
+        with open("saves/active_rewards.json", "w") as file:
+            json.dump(active_rewards, file)
+        
+        print("\nAd watch cooldown has been reset successfully.")
+        print("You can now watch another ad for a reward.")
+    except Exception as e:
+        print(f"\nError resetting ad watch cooldown: {e}")
+    
+    input("\nPress Enter to continue...")
+
+if __name__ == "__main__":
+    admin_menu()
